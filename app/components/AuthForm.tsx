@@ -85,10 +85,10 @@ export default function AuthForm() {
         // setUser(res.user);
       }
 
-      setTimeout(() => {
-        window.location.href = "/home";
-      }, 300);
-      //router.push("/home");
+      // setTimeout(() => {
+      //   window.location.href = "/home";
+      // }, 300);
+      router.push("/home");
       console.log("Redirigiendo a /home...");
     } catch (error) {
       if (axios.isAxiosError(error)) {

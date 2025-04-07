@@ -4,7 +4,6 @@ import Link from "next/link";
 import { IRecipe } from "../lib/interfaces";
 
 export default function RecipeCard({ recipe }: { recipe: IRecipe }) {
-
   //console.log("URL de la imagen CARD:", recipe.imageURL);
 
   return (
@@ -26,19 +25,19 @@ export default function RecipeCard({ recipe }: { recipe: IRecipe }) {
       >
         <div className="relative w-full h-40 sm:h-48 md:h-52">
           {recipe.imageUrl ? (
-          <Image
-            src={recipe.imageUrl}
-            alt={recipe.title || "Imagen de la receta"}
-            fill
-            className="object-cover rounded-xl"
-          />
+            // Como la url cambia frecuentemente no es recomendable usar Image
+            <img
+              src={recipe.imageUrl}
+              alt={recipe.title || "Imagen de la receta"}
+              className="object-cover rounded-xl"
+            />
           ) : (
-          <Image
-            src="/pollo.jpg"
-            alt={recipe.title || "Imagen de la receta"}
-            fill
-            className="object-cover rounded-xl"
-          />
+            <Image
+              src="/pollo.jpg"
+              alt={recipe.title || "Imagen de la receta"}
+              fill
+              className="object-cover rounded-xl"
+            />
           )}
         </div>
 

@@ -3,14 +3,14 @@
 import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { useParams } from "next/navigation";
-import Image from "next/image";
+//import Image from "next/image";
 import {
   ArrowLongLeftIcon,
   ClockIcon,
   BanknotesIcon,
 } from "@heroicons/react/24/solid";
 import { IRecipe } from "../../lib/interfaces"; // Ajusta la ruta según tu proyecto
-import { recipeApi } from "../../lib/data";     // Ajusta según tu API
+import { recipeApi } from "../../lib/data"; // Ajusta según tu API
 import SquareBar from "@/app/components/SquareBar";
 
 // Rango de ejemplo para calcular las barras (o cuadrados) de nutrientes
@@ -21,7 +21,10 @@ const NUTRIENT_RANGES = {
   fat: { min: 5, max: 30 },
 };
 
-function getFilledSquares(value: number, nutrient: keyof typeof NUTRIENT_RANGES) {
+function getFilledSquares(
+  value: number,
+  nutrient: keyof typeof NUTRIENT_RANGES
+) {
   const { min, max } = NUTRIENT_RANGES[nutrient];
   // Se mapean 5 cuadrados en total
   return Math.round(((value - min) / (max - min)) * 4) + 1;
@@ -64,10 +67,9 @@ export default function RecipeDetailsPage() {
 
       {/* Encabezado / Imagen principal */}
       <header className="relative w-full h-64 mb-6">
-        <Image
+        <img
           src={recipe.imageUrl || "/pollo.jpg"}
           alt={recipe.title}
-          fill
           className="object-cover rounded-xl shadow-md"
         />
       </header>
@@ -117,32 +119,46 @@ export default function RecipeDetailsPage() {
           </section>
           {/* Sección Información Nutricional */}
           <aside className="bg-white p-4 rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold mb-4">Información Nutricional</h2>
+            <h2 className="text-lg font-semibold mb-4">
+              Información Nutricional
+            </h2>
 
             <div className="mb-4">
               <div className="flex items-center justify-between text-sm text-gray-700">
                 <span>Calorías</span>
-                <span className="font-bold">{recipe.nutritionalInfo.calories} Kcal</span>
+                <span className="font-bold">
+                  {recipe.nutritionalInfo.calories} Kcal
+                </span>
               </div>
               <SquareBar
-                filled={getFilledSquares(recipe.nutritionalInfo.calories, "calories")}
+                filled={getFilledSquares(
+                  recipe.nutritionalInfo.calories,
+                  "calories"
+                )}
               />
             </div>
 
             <div className="mb-4">
               <div className="flex items-center justify-between text-sm text-gray-700">
                 <span>Proteína</span>
-                <span className="font-bold">{recipe.nutritionalInfo.protein} g</span>
+                <span className="font-bold">
+                  {recipe.nutritionalInfo.protein} g
+                </span>
               </div>
               <SquareBar
-                filled={getFilledSquares(recipe.nutritionalInfo.protein, "protein")}
+                filled={getFilledSquares(
+                  recipe.nutritionalInfo.protein,
+                  "protein"
+                )}
               />
             </div>
 
             <div className="mb-4">
               <div className="flex items-center justify-between text-sm text-gray-700">
                 <span>Carbohidratos</span>
-                <span className="font-bold">{recipe.nutritionalInfo.carbs} g</span>
+                <span className="font-bold">
+                  {recipe.nutritionalInfo.carbs} g
+                </span>
               </div>
               <SquareBar
                 filled={getFilledSquares(recipe.nutritionalInfo.carbs, "carbs")}
@@ -152,7 +168,9 @@ export default function RecipeDetailsPage() {
             <div>
               <div className="flex items-center justify-between text-sm text-gray-700">
                 <span>Grasas</span>
-                <span className="font-bold">{recipe.nutritionalInfo.fat} g</span>
+                <span className="font-bold">
+                  {recipe.nutritionalInfo.fat} g
+                </span>
               </div>
               <SquareBar
                 filled={getFilledSquares(recipe.nutritionalInfo.fat, "fat")}
@@ -163,7 +181,9 @@ export default function RecipeDetailsPage() {
 
         {/* Sección de Ingredientes - estilo “tarjetado” en grid */}
         <section className="bg-white p-4 mt-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900">Ingredientes</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">
+            Ingredientes
+          </h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {recipe.ingredients.map((item, index) => (
               <div
@@ -181,7 +201,9 @@ export default function RecipeDetailsPage() {
 
         {/* Sección de Pasos - estilo “timeline” */}
         <section className="bg-white p-4 mt-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900">Preparación</h2>
+          <h2 className="text-xl font-semibold mb-4 text-gray-900">
+            Preparación
+          </h2>
 
           {/* Contenedor con una línea a la izquierda simulando un timeline */}
           <div className="relative border-l-4 border-orange-300 pl-6">
@@ -189,7 +211,9 @@ export default function RecipeDetailsPage() {
               <div key={index} className="mb-6 relative">
                 {/* Pequeño círculo para cada paso */}
                 <div className="w-4 h-4 bg-orange-300 rounded-full absolute -left-2 top-1" />
-                <h3 className="font-semibold mb-1 ml-4">Paso {step.stepNumber}</h3>
+                <h3 className="font-semibold mb-1 ml-4">
+                  Paso {step.stepNumber}
+                </h3>
                 <p className="text-gray-700">{step.description}</p>
               </div>
             ))}
