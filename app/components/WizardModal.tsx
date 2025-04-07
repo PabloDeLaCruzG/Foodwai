@@ -85,13 +85,20 @@ export default function WizardModal({ onClose }: WizardModalProps) {
     try {
       const generatedRecipe = await recipeApi.generateRecipe(userPreferences);
 
+      // Llamada en segundo plano para generar la imagen
+      recipeApi
+        .generateImageForRecipe(generatedRecipe.recipe._id)
+        .catch((err) =>
+          console.error("Error generando imagen (en segundo plano):", err)
+        );
+
+      // Navegamos inmediatamente
       router.push(`/home/${generatedRecipe.recipe._id}`);
 
       // Cerramos el modal
       onClose();
     } catch (error) {
       console.error("Error generating recipe:", error);
-      // Maneja el error si quieres mostrar un mensaje
     } finally {
       setIsLoading(false); // Fin de la carga
     }

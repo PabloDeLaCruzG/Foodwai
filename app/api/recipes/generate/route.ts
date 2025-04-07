@@ -133,11 +133,14 @@ export async function POST(req: NextRequest) {
     `;
 
     const recipeData = await AIRecipeService.generateRecipeFromPrompt(prompt);
-    const imageUrl = await AIRecipeService.generateRecipeImage(
-      recipeData.title,
-      recipeData.ingredients,
-      recipeData.steps
-    );
+
+    // const imageUrl = await AIRecipeService.generateRecipeImage(
+    //   recipeData.title,
+    //   recipeData.ingredients,
+    //   recipeData.steps
+    // );
+
+    const imageUrl = null; // La imagen se generará por separado en otro endpoint
 
     const newRecipe = new Recipe({
       ...recipeData,

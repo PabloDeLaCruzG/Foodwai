@@ -1,5 +1,4 @@
 import React from "react";
-import Image from "next/image";
 import Link from "next/link";
 import { IRecipe } from "../lib/interfaces";
 
@@ -32,12 +31,7 @@ export default function RecipeCard({ recipe }: { recipe: IRecipe }) {
               className="object-cover rounded-xl"
             />
           ) : (
-            <Image
-              src="/pollo.jpg"
-              alt={recipe.title || "Imagen de la receta"}
-              fill
-              className="object-cover rounded-xl"
-            />
+            <div className="w-full h-full bg-gray-200 rounded-xl animate-pulse" />
           )}
         </div>
 

@@ -97,6 +97,25 @@ export const recipeApi = {
       throw error;
     }
   },
+
+  generateImageForRecipe: async (recipeId: string) => {
+    try {
+      const response = await axios.post(
+        "/api/recipes/generate-image",
+        { recipeId },
+        {
+          headers: {
+            "Content-Type": "application/json",
+          },
+          withCredentials: true,
+        }
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Error al generar la imagen de la receta:", error);
+      throw error;
+    }
+  },
 };
 
 export const authApi = {

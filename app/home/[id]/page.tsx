@@ -67,11 +67,15 @@ export default function RecipeDetailsPage() {
 
       {/* Encabezado / Imagen principal */}
       <header className="relative w-full h-64 mb-6">
-        <img
-          src={recipe.imageUrl || "/pollo.jpg"}
-          alt={recipe.title}
-          className="object-cover rounded-xl shadow-md"
-        />
+        {recipe.imageUrl ? (
+          <img
+            src={recipe.imageUrl}
+            alt={recipe.title}
+            className="object-cover rounded-xl shadow-md w-full h-full"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 rounded-xl animate-pulse" />
+        )}
       </header>
 
       {/* Título y descripción */}
