@@ -85,23 +85,7 @@ export default function AuthForm() {
         // setUser(res.user);
       }
 
-      const checkTokenAndRedirect = async () => {
-        let attempts = 0;
-        while (attempts < 10) {
-          const cookies = document.cookie;
-          if (cookies.includes("token=")) {
-            console.log("Token encontrado. Redirigiendo a /home...");
-            router.push("/home");
-            return;
-          }
-          await new Promise((res) => setTimeout(res, 100));
-          attempts++;
-        }
-        console.warn("No se detectó token tras el login");
-      };
-
-      checkTokenAndRedirect();
-      //router.push("/home");
+      router.push("/home");
       console.log("Redirigiendo a /home...");
     } catch (error) {
       if (axios.isAxiosError(error)) {
