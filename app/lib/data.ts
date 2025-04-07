@@ -101,7 +101,7 @@ export const recipeApi = {
   generateImageForRecipe: async (recipeId: string) => {
     try {
       const response = await axios.post(
-        "/api/recipes/generate-image",
+        "/api/recipes/generateImage",
         { recipeId },
         {
           headers: {

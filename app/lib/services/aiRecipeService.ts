@@ -1,5 +1,5 @@
 import { openai } from "../openai";
-import JSON5 from "json5";
+// import JSON5 from "json5";
 import { AIRecipeData } from "../interfaces";
 import cloudinary from "../cloudinary";
 import axios from "axios";
@@ -13,13 +13,11 @@ export class AIRecipeService {
           {
             role: "system",
             content:
-              "Eres un chef profesional con gran creatividad y experiencia. El usuario quiere la respuesta en un idioma específico, y debes responder ÚNICAMENTE en JSON estricto y con detalle en la elaboración. No incluyas texto adicional fuera del JSON",
+              "Responde únicamente con una receta en JSON válido. No añadas explicaciones. Responde exclusivamente con JSON válido sin comentarios, sin explicaciones, sin etiquetas ni backticks.",
           },
           {
             role: "user",
-            content: `Idioma deseado: ${
-              process.env.SYSTEM_LANGUAGE || "en"
-            }, Prompt: ${prompt}`,
+            content: `Idioma: ${process.env.SYSTEM_LANGUAGE || "en"}. ${prompt}`,
           },
         ],
       });
@@ -38,8 +36,8 @@ export class AIRecipeService {
         cleanedResponse = match[0];
       }
 
-      // Parsear con JSON5
-      const recipeData: AIRecipeData = JSON5.parse(cleanedResponse);
+      // Parsear con JSON
+      const recipeData: AIRecipeData = JSON.parse(cleanedResponse);
 
       // Forzamos a que tenga un array de steps, y que no esté vacío
       if (
@@ -82,7 +80,7 @@ export class AIRecipeService {
       const response = await openai.images.generate({
         prompt: `Foto realista y profesional del plato: ${recipeTitle}, que lleva: ${ingString}. Elaboración con pasos: ${stepsString}. Iluminacion natural, alta resolucion.`,
         n: 1,
-        size: "1024x1024",
+        size: "512x512",
       });
 
       // Chequeo del resultado
