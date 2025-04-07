@@ -30,10 +30,7 @@ export async function GET(req: NextRequest) {
   }
 }
 
-export async function DELETE(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function DELETE(req: NextRequest) {
   try {
     await connectDB();
 
@@ -45,7 +42,10 @@ export async function DELETE(
       );
     }
 
-    const { id } = params;
+    const id = req.nextUrl.pathname.split("/").pop();
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
+      return NextResponse.json({ message: "ID inválido" }, { status: 400 });
+    }
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ message: "ID inválido" }, { status: 400 });
     }
