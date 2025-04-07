@@ -31,5 +31,5 @@ export function middleware(req: NextRequest) {
 
 // Define las rutas donde se aplicará este middleware (todas excepto la raíz)
 export const config = {
-  matcher: ["/home", "/home/[id]"],
+  matcher: ["/home/:path*"],
 };

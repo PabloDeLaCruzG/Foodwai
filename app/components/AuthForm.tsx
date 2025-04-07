@@ -86,13 +86,8 @@ export default function AuthForm() {
       }
 
       setTimeout(() => {
-        if (document.cookie.includes("token")) {
-          console.log("Token presente, redirigiendo...");
-          window.location.href = "/home";
-        } else {
-          console.warn("No se detectó token tras login");
-        }
-      }, 200);
+        window.location.href = "/home";
+      }, 300);
       //router.push("/home");
       console.log("Redirigiendo a /home...");
     } catch (error) {
