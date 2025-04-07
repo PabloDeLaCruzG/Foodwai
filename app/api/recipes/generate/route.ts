@@ -4,18 +4,25 @@ import Recipe from "@/app/lib/models/Recipe";
 import User from "@/app/lib/models/User";
 import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
 import { resetDailyUsage } from "@/app/lib/utils/userUtils";
+import jwt from "jsonwebtoken";
 
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
-    const userId = req.headers.get("x-user-id"); // Simulación del user._id
-    if (!userId) {
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
       return NextResponse.json(
-        { message: "Usuario no autenticado" },
+        { message: "Token no proporcionado" },
         { status: 401 }
       );
     }
+
+    // Verificamos el token
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id: string;
+    };
+    const userId = decoded.id;
 
     const user = await User.findById(userId);
     if (!user) {
