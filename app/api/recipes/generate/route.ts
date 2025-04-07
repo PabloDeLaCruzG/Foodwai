@@ -132,8 +132,11 @@ export async function POST(req: NextRequest) {
       No dejes el campo "unit" vacío.
     `;
 
+    console.log("PROMPT ENVIADO A OPENAI:", prompt);
+
     const recipeData = await AIRecipeService.generateRecipeFromPrompt(prompt);
 
+    console.log("RECIPE DATA:", recipeData);
     // const imageUrl = await AIRecipeService.generateRecipeImage(
     //   recipeData.title,
     //   recipeData.ingredients,
