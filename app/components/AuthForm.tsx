@@ -84,18 +84,23 @@ export default function AuthForm() {
         console.log("Registro OK");
         // setUser(res.user);
       }
-      setTimeout(() => {
-        const token = document.cookie
-          .split("; ")
-          .find((cookie) => {
-            return cookie.startsWith("token");
-          })
-          ?.split("=")[1];
-        console.log("Token:", token);
-        if (token) {
-          router.push("/home");
+
+      const checkTokenAndRedirect = async () => {
+        let attempts = 0;
+        while (attempts < 10) {
+          const cookies = document.cookie;
+          if (cookies.includes("token=")) {
+            console.log("Token encontrado. Redirigiendo a /home...");
+            router.push("/home");
+            return;
+          }
+          await new Promise((res) => setTimeout(res, 100));
+          attempts++;
         }
-      }, 100);
+        console.warn("No se detectó token tras el login");
+      };
+
+      checkTokenAndRedirect();
       //router.push("/home");
       console.log("Redirigiendo a /home...");
     } catch (error) {
