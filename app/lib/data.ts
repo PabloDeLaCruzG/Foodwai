@@ -122,7 +122,7 @@ export const authApi = {
   googleAuth: async (idToken: string) => {
     try {
       const response = await axios.post(
-        "/api/auth/google",
+        "/api/auth/googleAuth",
         {
           idToken,
         },
