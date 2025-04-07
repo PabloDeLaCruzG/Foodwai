@@ -1,11 +1,6 @@
 import axios from "axios";
 import { GenerateRecipeBody, IRecipe, IUser } from "./interfaces";
 
-// Ponerlo en .env
-const API_URL = `${process.env.NEXT_PUBLIC_API_URL}/api/recipes`;
-const API_URL_AUTH = `${process.env.NEXT_PUBLIC_API_URL}/api/auth/`;
-const API_URL_USER = `${process.env.NEXT_PUBLIC_API_URL}/api/users/`;
-
 export const recipeApi = {
   /**
    * Obtiene todas las recetas del backend.
@@ -13,7 +8,7 @@ export const recipeApi = {
    */
   getAllRecipes: async (): Promise<IRecipe[]> => {
     try {
-      const response = await axios.get(API_URL);
+      const response = await axios.get("/api/recipes");
       return response.data;
     } catch (error) {
       console.error("Error al obtener todas las recetas:", error);
@@ -23,7 +18,7 @@ export const recipeApi = {
 
   getRecipesByAuthor: async (authorId: string): Promise<IRecipe[]> => {
     try {
-      const response = await axios.get(`${API_URL}/author`, {
+      const response = await axios.get("/api/recipes/author", {
         params: {
           authorId,
         },
@@ -42,7 +37,7 @@ export const recipeApi = {
    */
   getRecipeById: async (id: string): Promise<IRecipe> => {
     try {
-      const response = await axios.get(`${API_URL}/${id}`, {
+      const response = await axios.get("/api/recipes/" + id, {
         withCredentials: true,
       });
       return response.data;
@@ -58,7 +53,7 @@ export const recipeApi = {
    */
   deleteRecipeById: async (id: string) => {
     try {
-      const response = await axios.delete(`${API_URL}/${id}`, {
+      const response = await axios.delete("/api/recipes/" + id, {
         withCredentials: true,
       });
       return response.data;
@@ -74,7 +69,7 @@ export const recipeApi = {
    */
   createRecipe: async (recipe: IRecipe) => {
     try {
-      const response = await axios.post(API_URL, recipe, {
+      const response = await axios.post("/api/recipes", recipe, {
         withCredentials: true,
       });
       return response.data;
@@ -90,7 +85,7 @@ export const recipeApi = {
    */
   generateRecipe: async (recipeParams: GenerateRecipeBody) => {
     try {
-      const response = await axios.post(`${API_URL}/generate`, recipeParams, {
+      const response = await axios.post("/api/recipes/generate", recipeParams, {
         headers: {
           "Content-Type": "application/json",
         },
@@ -108,7 +103,7 @@ export const authApi = {
   googleAuth: async (idToken: string) => {
     try {
       const response = await axios.post(
-        API_URL_AUTH + "google",
+        "/api/auth/google",
         {
           idToken,
         },
@@ -126,7 +121,7 @@ export const authApi = {
    */
   registerUser: async (user: IUser) => {
     try {
-      const response = await axios.post(API_URL_AUTH + "register", user, {
+      const response = await axios.post("/api/auth/register", user, {
         withCredentials: true,
       });
       return response.data;
@@ -142,7 +137,7 @@ export const authApi = {
    */
   loginUser: async (user: IUser) => {
     try {
-      const response = await axios.post(API_URL_AUTH + "login", user, {
+      const response = await axios.post("/api/auth/login", user, {
         withCredentials: true,
       });
 
@@ -156,7 +151,7 @@ export const authApi = {
   logoutUser: async () => {
     try {
       const response = await axios.post(
-        API_URL_AUTH + "logout",
+        "/api/auth/logout",
         {},
         {
           withCredentials: true,
@@ -176,7 +171,7 @@ export const authApi = {
    */
   checkEmailExists: async (email: string) => {
     try {
-      const response = await axios.post(API_URL_AUTH + "checkEmailExists", {
+      const response = await axios.post("/api/auth/checkEmailExists", {
         email,
       });
       return response.data;
@@ -190,7 +185,7 @@ export const authApi = {
 export const userApi = {
   getCurrentUser: async () => {
     try {
-      const response = await axios.get(API_URL_USER + "user", {
+      const response = await axios.get("/api/users/user", {
         withCredentials: true,
       });
       return response.data;
@@ -203,7 +198,7 @@ export const userApi = {
   watchAdReward: async () => {
     try {
       const response = await axios.post(
-        API_URL_USER + "watchAdReward",
+        "/api/users/watchAdReward",
         {},
         {
           withCredentials: true,
@@ -218,7 +213,7 @@ export const userApi = {
 
   getDailyStatus: async () => {
     try {
-      const response = await axios.get(API_URL_USER + "dailyStatus", {
+      const response = await axios.get("/api/users/dailyStatus", {
         withCredentials: true,
       });
       return response.data;

@@ -3,15 +3,12 @@ import { connectDB } from "@/app/lib/db";
 import Recipe from "@/app/lib/models/Recipe";
 import mongoose from "mongoose";
 
-export async function GET(
-  req: NextRequest,
-  { params }: { params: { id: string } }
-) {
+export async function GET(req: NextRequest) {
   try {
     await connectDB();
 
-    const { id } = params;
-    if (!mongoose.Types.ObjectId.isValid(id)) {
+    const id = req.nextUrl.pathname.split("/").pop();
+    if (!id || !mongoose.Types.ObjectId.isValid(id)) {
       return NextResponse.json({ message: "ID inválido" }, { status: 400 });
     }
 
