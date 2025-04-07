@@ -85,7 +85,15 @@ export default function AuthForm() {
         // setUser(res.user);
       }
 
-      router.push("/home");
+      setTimeout(() => {
+        if (document.cookie.includes("token")) {
+          console.log("Token presente, redirigiendo...");
+          window.location.href = "/home";
+        } else {
+          console.warn("No se detectó token tras login");
+        }
+      }, 200);
+      //router.push("/home");
       console.log("Redirigiendo a /home...");
     } catch (error) {
       if (axios.isAxiosError(error)) {

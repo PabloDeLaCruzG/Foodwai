@@ -4,6 +4,7 @@ import type { NextRequest } from "next/server";
 export function middleware(req: NextRequest) {
   // Obtén la URL solicitada
   const { pathname } = req.nextUrl;
+  console.log("Cookies disponibles:", req.cookies.getAll());
 
   // Si la solicitud es para la raíz o para archivos estáticos, se permite
   if (
