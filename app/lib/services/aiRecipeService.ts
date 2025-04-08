@@ -5,6 +5,7 @@ import axios from "axios";
 
 export class AIRecipeService {
   static async generateRecipeFromPrompt(prompt: string): Promise<AIRecipeData> {
+    const userLanguage = navigator.language;
     try {
       const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo",
@@ -12,11 +13,11 @@ export class AIRecipeService {
           {
             role: "system",
             content:
-              "Responde únicamente con una receta en JSON válido. No añadas explicaciones. Responde exclusivamente con JSON válido sin comentarios, sin explicaciones, sin etiquetas ni backticks.",
+              "Responde exclusivamente con JSON válido sin comentarios, sin explicaciones, sin etiquetas ni backticks.",
           },
           {
             role: "user",
-            content: `Idioma: ${process.env.SYSTEM_LANGUAGE || "en"}. ${prompt}`,
+            content: `Idioma: ${userLanguage || "es"}. ${prompt}`,
           },
         ],
       });

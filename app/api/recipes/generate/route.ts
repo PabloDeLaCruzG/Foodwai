@@ -87,7 +87,34 @@ export async function POST(req: NextRequest) {
       Propósito: ${purpose || "general"}
       Detalles extra: ${extraDetails || "ninguno"}
 
-      Devuelve JSON válido siguiendo el esquema indicado.
+      Devuelve un JSON ESTRICTAMENTE válido con la siguiente estructura:
+        {
+        "title": "string",
+        "description": "string",
+        "cookingTime": 30,
+        "difficulty": "string",
+        "costLevel": "string",
+        "cuisine": "string",
+        "nutritionalInfo": {
+          "calories": 300,
+          "protein": 20,
+          "fat": 10,
+          "carbs": 50
+        },
+        "ingredients": [
+          {
+            "name": "Ingrediente 1",
+            "quantity": 100 (Si es al gusto pon un 1),
+            "unit": "g" (Si es al gusto pon al gusto)
+          }
+        ],
+        "steps": [
+          {
+            "stepNumber": 1,
+            "description": "Descripción detallada del paso"
+          }
+        ]
+      }
     `;
 
     console.log("PROMPT ENVIADO A OPENAI:", prompt);
