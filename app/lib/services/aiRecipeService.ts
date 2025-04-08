@@ -85,13 +85,19 @@ export class AIRecipeService {
         ],
         functions,
         // Se usa 'tool_calls' ya que 'function_call' está deprecado.
-        function_call: "auto", // Aún se configura de esta forma, pero se espera que la respuesta la entregues mediante 'tool_calls'
+        // function_call: "auto", // Aún se configura de esta forma, pero se espera que la respuesta la entregues mediante 'tool_calls'
+        function_call: { name: "createRecipe" },
         temperature: 0,
         max_tokens: 800,
       });
 
-      // Accedemos a la respuesta utilizando la nueva propiedad 'tool_calls'
-      const message = response.choices[0].message;
+      console.log(
+        "RESPONSE COMPLETA DE OPENAI:",
+        JSON.stringify(response, null, 2)
+      );
+      const message = response.choices[0]?.message;
+
+      console.log("MESSAGE COMPLETA:", JSON.stringify(message, null, 2));
       let recipeData: AIRecipeData;
 
       if (
