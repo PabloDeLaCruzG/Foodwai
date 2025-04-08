@@ -95,6 +95,8 @@ export async function POST(req: NextRequest) {
     // Generar la receta
     const recipeData = await AIRecipeService.generateRecipeFromPrompt(prompt);
 
+    console.log("RECETA:", recipeData);
+
     // Guardar receta
     const newRecipe = new Recipe({
       ...recipeData,
