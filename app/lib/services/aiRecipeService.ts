@@ -71,7 +71,7 @@ export class AIRecipeService {
 
       // Llamada a la API de OpenAI usando function calling
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo-0613",
+        model: "gpt-3.5-turbo",
         messages: [
           {
             role: "system",
