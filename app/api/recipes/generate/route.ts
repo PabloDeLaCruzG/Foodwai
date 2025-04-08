@@ -18,7 +18,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verificamos el token
+    // Verificar el token
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       id: string;
     };
@@ -33,13 +33,10 @@ export async function POST(req: NextRequest) {
     }
 
     resetDailyUsage(user);
-
-    // Si no hay valores, inicializamos
     user.dailyGenerationCount ??= 0;
     user.rewardedGenerations ??= 0;
 
     let hasCredit = false;
-
     if (user.dailyGenerationCount > 0) {
       user.dailyGenerationCount -= 1;
       hasCredit = true;
@@ -57,6 +54,7 @@ export async function POST(req: NextRequest) {
 
     await user.save();
 
+    // Procesar los parámetros enviados en la request
     const {
       selectedCuisines,
       dietRestrictions,
@@ -76,13 +74,12 @@ export async function POST(req: NextRequest) {
     const includeStr = ingredientsToInclude?.join(", ") || "none";
     const excludeStr = ingredientsToExclude?.join(", ") || "none";
 
-    const userLanguage =
-      req.headers.get("accept-language")?.split(",")[0] || "en";
+    // const userLanguage =
+    //   req.headers.get("accept-language")?.split(",")[0] || "en";
 
+    // Armado del prompt con las instrucciones esenciales y esquema de salida
     const prompt = `
-      Eres un asistente culinario. Por favor, responde estrictamente en formato JSON en ${userLanguage}.
       Genera una receta que cumpla con los siguientes parámetros:
-
       Tipos de cocina: ${cuisinesStr}.
       Restricciones dietéticas: ${dietStr}.
       Alérgenos adicionales: ${extraAllergens || "ninguno"}.
@@ -94,11 +91,9 @@ export async function POST(req: NextRequest) {
       Raciones: ${servings}.
       Propósito: ${purpose || "general"}.
       Detalles extra: ${extraDetails || "ninguno"}.
-
-      Genera una receta que cumpla con estos criterios.
-
-      Devuelve un JSON ESTRICTAMENTE válido con la siguiente estructura:
-        {
+      
+      Devuelve un JSON ESTRICTAMENTE válido de acuerdo al siguiente esquema:
+      {
         "title": "string",
         "description": "string",
         "cookingTime": 30,
@@ -125,25 +120,17 @@ export async function POST(req: NextRequest) {
           }
         ]
       }
-
-      No incluyas texto adicional, corchetes o llaves extra o faltantes.
-      No uses valores de texto para "quantity".
-      Si un ingrediente se usa “al gusto”, establece "quantity" en 1 y "unit" en "al gusto".
-      No dejes el campo "unit" vacío.
+      No añadas texto adicional ni formateos extra.
     `;
 
     console.log("PROMPT ENVIADO A OPENAI:", prompt);
 
+    // Llamada al servicio de generación de receta
     const recipeData = await AIRecipeService.generateRecipeFromPrompt(prompt);
 
     console.log("RECIPE DATA:", recipeData);
-    // const imageUrl = await AIRecipeService.generateRecipeImage(
-    //   recipeData.title,
-    //   recipeData.ingredients,
-    //   recipeData.steps
-    // );
-
-    const imageUrl = null; // La imagen se generará por separado en otro endpoint
+    // La generación de imagen se maneja en otro endpoint, por lo que se deja nula aquí
+    const imageUrl = null;
 
     const newRecipe = new Recipe({
       ...recipeData,
@@ -157,10 +144,34 @@ export async function POST(req: NextRequest) {
       { message: "Receta generada exitosamente", recipe: newRecipe },
       { status: 201 }
     );
-  } catch (error) {
-    console.error("Error al generar la receta:", error);
+  } catch (error: unknown) {
+    // Comprobamos si es un error tipo Axios (por ejemplo)
+    if (
+      typeof error === "object" &&
+      error !== null &&
+      "response" in error &&
+      typeof (error as Record<string, unknown>).response === "object"
+    ) {
+      const responseData = (error as { response: { data: unknown } }).response
+        .data;
+
+      console.error("Respuesta del modelo:", responseData);
+
+      return NextResponse.json(
+        {
+          message: "Error en el servicio de generación",
+          details: responseData,
+        },
+        { status: 502 }
+      );
+    }
+
+    // Para errores estándar
     return NextResponse.json(
-      { message: "Error al generar la receta", error: error },
+      {
+        message: "Error inesperado al generar la receta",
+        error: error instanceof Error ? error.message : "Unknown error",
+      },
       { status: 500 }
     );
   }
