@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
-import Recipe from "@/app/lib/models/Recipe";
+// import Recipe from "@/app/lib/models/Recipe";
 import jwt from "jsonwebtoken";
-import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
+// import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
+import { Client } from "@upstash/qstash";
 
 export async function POST(req: NextRequest) {
   try {
@@ -26,28 +27,43 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Falta recipeId" }, { status: 400 });
     }
 
-    const recipe = await Recipe.findOne({ _id: recipeId, authorId: userId });
-    if (!recipe) {
-      return NextResponse.json(
-        { message: "Receta no encontrada" },
-        { status: 404 }
-      );
-    }
+    const qstash = new Client({
+      token: process.env.QSTASH_TOKEN!,
+    });
 
-    const imageUrl = await AIRecipeService.generateRecipeImage(
-      recipe.title,
-      recipe.ingredients,
-      recipe.steps
-    );
+    await qstash.publishJSON({
+      //url: `${process.env.BASE_URL}/api/process-image`,
+      url: "https://foodwai.vercel.app/api/process-image",
+      body: {
+        recipeId,
+        userId,
+      },
+    });
 
-    recipe.imageUrl = imageUrl;
-    await recipe.save();
+    return NextResponse.json({ message: "Imagen en proceso" }, { status: 202 });
 
-    return NextResponse.json(recipe, { status: 200 });
+    // const recipe = await Recipe.findOne({ _id: recipeId, authorId: userId });
+    // if (!recipe) {
+    //   return NextResponse.json(
+    //     { message: "Receta no encontrada" },
+    //     { status: 404 }
+    //   );
+    // }
+
+    // const imageUrl = await AIRecipeService.generateRecipeImage(
+    //   recipe.title,
+    //   recipe.ingredients,
+    //   recipe.steps
+    // );
+
+    // recipe.imageUrl = imageUrl;
+    // await recipe.save();
+
+    // return NextResponse.json(recipe, { status: 200 });
   } catch (error) {
-    console.error("Error generando imagen:", error);
+    console.error("Error encolando tarea:", error);
     return NextResponse.json(
-      { message: "Error generando imagen", error },
+      { message: "Error encolando imagen", error },
       { status: 500 }
     );
   }

@@ -36,12 +36,29 @@ export default function RecipeDetailsPage() {
 
   // Traer la receta del API
   useEffect(() => {
+    let intervalId: NodeJS.Timeout;
+
+    const fetchRecipe = async () => {
+      try {
+        const data = await recipeApi.getRecipeById(id!);
+        setRecipe(data);
+
+        if (data.imageUrl && intervalId) {
+          clearInterval(intervalId!);
+        }
+      } catch (error: unknown) {
+        console.error("Error fetching recipe:", error as Error);
+      }
+    };
+
     if (id) {
-      recipeApi
-        .getRecipeById(id)
-        .then((data) => setRecipe(data))
-        .catch((error) => console.error("Error fetching recipe:", error));
+      fetchRecipe();
+
+      intervalId = setInterval(() => {
+        fetchRecipe();
+      }, 10000); // Polling cada 10 segundos
     }
+    
   }, [id]);
 
   if (!recipe) {
@@ -71,10 +88,16 @@ export default function RecipeDetailsPage() {
           <img
             src={recipe.imageUrl}
             alt={recipe.title}
-            className="object-cover rounded-xl shadow-md w-full h-full"
+            className="object-cover rounded-xl shadow-md w-full h-full opacity-0 transition-opacity duration-700"
+            onLoad={(e) => e.currentTarget.classList.add("opacity-100")}
           />
         ) : (
           <div className="w-full h-full bg-gray-200 rounded-xl animate-pulse" />
+        )}
+        {!recipe.imageUrl && (
+          <span className="absolute top-2 left-2 bg-yellow-400 text-white text-xs px-2 py-1 rounded shadow">
+            Generando imagen...
+          </span>
         )}
       </header>
 
