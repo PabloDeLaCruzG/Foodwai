@@ -24,7 +24,7 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.13.2",
     "next": "^15.2.4",
-    "openai": "^4.91.1",
+    "openai": "^4.92.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.54.2",

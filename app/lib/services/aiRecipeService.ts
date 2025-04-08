@@ -6,7 +6,6 @@ import axios from "axios";
 export class AIRecipeService {
   static async generateRecipeFromPrompt(prompt: string): Promise<AIRecipeData> {
     try {
-      // Definición de la función con el esquema que debe cumplir la respuesta
       const functions = [
         {
           name: "createRecipe",
@@ -15,21 +14,12 @@ export class AIRecipeService {
           parameters: {
             type: "object",
             properties: {
-              title: { type: "string", description: "Título de la receta." },
-              description: {
-                type: "string",
-                description: "Descripción de la receta.",
-              },
-              cookingTime: {
-                type: "number",
-                description: "Tiempo de cocción en minutos.",
-              },
-              difficulty: {
-                type: "string",
-                description: "Nivel de dificultad.",
-              },
-              costLevel: { type: "string", description: "Nivel de coste." },
-              cuisine: { type: "string", description: "Tipo de cocina." },
+              title: { type: "string" },
+              description: { type: "string" },
+              cookingTime: { type: "number" },
+              difficulty: { type: "string" },
+              costLevel: { type: "string" },
+              cuisine: { type: "string" },
               nutritionalInfo: {
                 type: "object",
                 properties: {
@@ -81,7 +71,7 @@ export class AIRecipeService {
 
       // Llamada a la API de OpenAI usando function calling
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo-0613", // Versión compatible con function calling
+        model: "gpt-3.5-turbo-0613",
         messages: [
           {
             role: "system",
@@ -90,38 +80,49 @@ export class AIRecipeService {
           },
           {
             role: "user",
-            content: `Idioma: ${process.env.SYSTEM_LANGUAGE || "en"}. ${prompt}`,
+            content: prompt,
           },
         ],
         functions,
-        function_call: "auto",
+        // Se usa 'tool_calls' ya que 'function_call' está deprecado.
+        function_call: "auto", // Aún se configura de esta forma, pero se espera que la respuesta la entregues mediante 'tool_calls'
         temperature: 0,
         max_tokens: 800,
       });
 
+      // Accedemos a la respuesta utilizando la nueva propiedad 'tool_calls'
       const message = response.choices[0].message;
       let recipeData: AIRecipeData;
 
-      // Si se usó function calling, se obtiene directamente el JSON desde la propiedad function_call.arguments
-      if (message?.function_call && message.function_call.arguments) {
+      if (
+        message?.tool_calls &&
+        message.tool_calls.length > 0 &&
+        message.tool_calls[0].function
+      ) {
         try {
-          recipeData = JSON.parse(message.function_call.arguments);
+          recipeData = JSON.parse(message.tool_calls[0].id);
         } catch (parseErr) {
-          throw new Error(
-            "Error al parsear la respuesta de función: " + parseErr
+          console.error(
+            "Error parseando la respuesta de tool_calls:",
+            parseErr
           );
+          throw new Error("Error al parsear el JSON devuelto por la función.");
         }
       } else {
-        // Fallback: limpiar y parsear manualmente la respuesta
-        let cleanedResponse = message?.content?.replace(/```/g, "").trim();
-        const match = cleanedResponse?.match(/\{[\s\S]*\}/);
+        // Fallback: limpiamos y parseamos manualmente la respuesta
+        const fallbackContent = message?.content || "";
+        console.warn(
+          "No se usó tool_calls. Respuesta fallback:",
+          fallbackContent
+        );
+        let cleanedResponse = fallbackContent.replace(/```/g, "").trim();
+        const match = cleanedResponse.match(/\{[\s\S]*\}/);
         if (match) {
           cleanedResponse = match[0];
         }
         recipeData = JSON.parse(cleanedResponse as string);
       }
 
-      // Verificación mínima de formato
       if (
         !recipeData.steps ||
         !Array.isArray(recipeData.steps) ||

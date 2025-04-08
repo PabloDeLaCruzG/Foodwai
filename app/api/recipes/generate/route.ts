@@ -18,7 +18,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Verificar el token
     const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
       id: string;
     };
@@ -51,10 +50,9 @@ export async function POST(req: NextRequest) {
         { status: 403 }
       );
     }
-
     await user.save();
 
-    // Procesar los parámetros enviados en la request
+    const bodyData = await req.json();
     const {
       selectedCuisines,
       dietRestrictions,
@@ -67,85 +65,56 @@ export async function POST(req: NextRequest) {
       servings,
       purpose,
       extraDetails,
-    } = await req.json();
+    } = bodyData;
 
     const cuisinesStr = selectedCuisines?.join(", ") || "no specific cuisines";
     const dietStr = dietRestrictions?.join(", ") || "no dietary restrictions";
     const includeStr = ingredientsToInclude?.join(", ") || "none";
     const excludeStr = ingredientsToExclude?.join(", ") || "none";
 
-    // const userLanguage =
-    //   req.headers.get("accept-language")?.split(",")[0] || "en";
-
-    // Armado del prompt con las instrucciones esenciales y esquema de salida
+    // Construimos el prompt de forma concisa
     const prompt = `
       Genera una receta que cumpla con los siguientes parámetros:
-      Tipos de cocina: ${cuisinesStr}.
-      Restricciones dietéticas: ${dietStr}.
-      Alérgenos adicionales: ${extraAllergens || "ninguno"}.
-      Ingredientes a incluir: ${includeStr}.
-      Ingredientes a excluir: ${excludeStr}.
-      Preferencia de tiempo de preparación: ${time}.
-      Nivel de dificultad: ${difficulty}.
-      Nivel de coste: ${cost}.
-      Raciones: ${servings}.
-      Propósito: ${purpose || "general"}.
-      Detalles extra: ${extraDetails || "ninguno"}.
-      
-      Devuelve un JSON ESTRICTAMENTE válido de acuerdo al siguiente esquema:
-      {
-        "title": "string",
-        "description": "string",
-        "cookingTime": 30,
-        "difficulty": "string",
-        "costLevel": "string",
-        "cuisine": "string",
-        "nutritionalInfo": {
-          "calories": 300,
-          "protein": 20,
-          "fat": 10,
-          "carbs": 50
-        },
-        "ingredients": [
-          {
-            "name": "Ingrediente 1",
-            "quantity": 100,
-            "unit": "g"
-          }
-        ],
-        "steps": [
-          {
-            "stepNumber": 1,
-            "description": "Descripción detallada del paso"
-          }
-        ]
-      }
-      No añadas texto adicional ni formateos extra.
+      Tipos de cocina: ${cuisinesStr}
+      Restricciones dietéticas: ${dietStr}
+      Alérgenos adicionales: ${extraAllergens || "ninguno"}
+      Ingredientes a incluir: ${includeStr}
+      Ingredientes a excluir: ${excludeStr}
+      Preferencia de tiempo de preparación: ${time}
+      Nivel de dificultad: ${difficulty}
+      Nivel de coste: ${cost}
+      Raciones: ${servings}
+      Propósito: ${purpose || "general"}
+      Detalles extra: ${extraDetails || "ninguno"}
+
+      Devuelve JSON válido siguiendo el esquema indicado.
     `;
 
     console.log("PROMPT ENVIADO A OPENAI:", prompt);
 
-    // Llamada al servicio de generación de receta
+    // Generar la receta
     const recipeData = await AIRecipeService.generateRecipeFromPrompt(prompt);
 
-    console.log("RECIPE DATA:", recipeData);
-    // La generación de imagen se maneja en otro endpoint, por lo que se deja nula aquí
-    const imageUrl = null;
-
+    // Guardar receta
     const newRecipe = new Recipe({
       ...recipeData,
-      imageUrl,
+      imageUrl: null, // la imagen se genera en otro endpoint
       authorId: userId,
     });
 
     await newRecipe.save();
 
     return NextResponse.json(
-      { message: "Receta generada exitosamente", recipe: newRecipe },
+      {
+        message: "Receta generada exitosamente",
+        recipe: newRecipe,
+      },
       { status: 201 }
     );
   } catch (error: unknown) {
-    // Comprobamos si es un error tipo Axios (por ejemplo)
+    console.error("Error en el endpoint /api/recipes/generate:", error);
+
+    // Si es error de axios con response
     if (
       typeof error === "object" &&
       error !== null &&
@@ -154,9 +123,7 @@ export async function POST(req: NextRequest) {
     ) {
       const responseData = (error as { response: { data: unknown } }).response
         .data;
-
       console.error("Respuesta del modelo:", responseData);
-
       return NextResponse.json(
         {
           message: "Error en el servicio de generación",
@@ -166,7 +133,6 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Para errores estándar
     return NextResponse.json(
       {
         message: "Error inesperado al generar la receta",
