@@ -5,8 +5,11 @@ import Recipe from "@/app/lib/models/Recipe";
 import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
 
 export const POST = verifySignatureAppRouter(async (req: Request) => {
+  console.log("📩 QStash ha llamado a /api/recipes/process-image");
+
   try {
     await connectDB();
+    console.log("Conectado a MongoDB");
 
     const { recipeId, userId } = await req.json();
 
@@ -18,11 +21,15 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
       );
     }
 
+    console.log("Receta encontrada:", recipe);
+
     const imageUrl = await AIRecipeService.generateRecipeImage(
       recipe.title,
       recipe.ingredients,
       recipe.steps
     );
+
+    console.log("Imagen generada:", imageUrl);
 
     recipe.imageUrl = imageUrl;
     await recipe.save();
