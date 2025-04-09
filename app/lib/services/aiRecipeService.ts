@@ -1,6 +1,6 @@
 import { openai } from "../openai";
 import { AIRecipeData } from "../interfaces";
-import cloudinary from "../cloudinary";
+import { uploadToCloudinary } from "@/app/lib/utils/cloudinaryHelper";
 import axios from "axios";
 
 export class AIRecipeService {
@@ -57,17 +57,6 @@ export class AIRecipeService {
     }
   }
 
-  private static uploadToCloudinary(buffer: Buffer): Promise<string> {
-    return new Promise((resolve, reject) => {
-      cloudinary.uploader
-        .upload_stream({ folder: "foodwai" }, (err, result) => {
-          if (err || !result) return reject(err);
-          resolve(result.secure_url);
-        })
-        .end(buffer);
-    });
-  }
-
   static async generateRecipeImage(
     recipeTitle: string,
     ingredients: { name: string }[],
@@ -87,15 +76,16 @@ export class AIRecipeService {
         throw new Error("No se pudo generar la imagen.");
       }
 
-      console.log("Response GPT Image", response)
+      console.log("Response GPT Image", response);
 
       const openaiImageUrl = response.data[0].url;
       const imageBuffer = await axios
         .get(openaiImageUrl, { responseType: "arraybuffer" })
         .then((res) => Buffer.from(res.data, "binary"));
-      const uploaded = await this.uploadToCloudinary(imageBuffer);
 
-      console.log("Uploaded Cloudinary", uploaded)
+      const uploaded = await uploadToCloudinary(imageBuffer);
+
+      console.log("Uploaded Cloudinary", uploaded);
 
       return uploaded;
     } catch (error) {

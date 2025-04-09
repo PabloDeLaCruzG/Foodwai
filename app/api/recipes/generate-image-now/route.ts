@@ -13,7 +13,10 @@ export async function POST(req: Request) {
     const recipe = await Recipe.findOne({ _id: recipeId, authorId: userId });
     if (!recipe) {
       console.warn("⚠️ Receta no encontrada:", { recipeId, userId });
-      return NextResponse.json({ error: "Receta no encontrada" }, { status: 404 });
+      return NextResponse.json(
+        { error: "Receta no encontrada" },
+        { status: 404 }
+      );
     }
 
     console.log("📋 Receta encontrada:", recipe.title);
@@ -26,12 +29,17 @@ export async function POST(req: Request) {
     );
     console.log("🖼️ Imagen generada:", imageUrl);
 
-    recipe.imageUrl = imageUrl;
-    await recipe.save();
+    fetch("https://foodwai.vercel.app/api/recipes/save-recipe-image", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ recipeId, userId, imageUrl }),
+    }).catch((err) =>
+      console.error("❌ Error lanzando guardado de imagen en background:", err)
+    );
 
-    console.log("✅ Imagen guardada para receta:", recipeId);
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ success: true, imageUrl });
   } catch (err) {
     console.error("❌ Error generando imagen directamente:", err);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
