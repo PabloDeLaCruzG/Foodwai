@@ -2,7 +2,6 @@ import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
 import Recipe from "@/app/lib/models/Recipe";
-import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
 
 export const POST = verifySignatureAppRouter(async (req: Request) => {
   console.log("📩 QStash ha llamado a /api/recipes/process-image");
@@ -23,18 +22,20 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
 
     console.log("Receta encontrada:", recipe);
 
-    const imageUrl = await AIRecipeService.generateRecipeImage(
-      recipe.title,
-      recipe.ingredients,
-      recipe.steps
+    // Llamada interna no bloqueante para generar imagen
+    fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/recipes/generate-image-now`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ recipeId, userId }),
+    }).catch((err) =>
+      console.error("❌ Error lanzando generación en background:", err)
     );
 
-    console.log("Imagen generada:", imageUrl);
+    console.log("✅ Generación delegada correctamente a /generate-image-now");
 
-    recipe.imageUrl = imageUrl;
-    await recipe.save();
-
-    return NextResponse.json({ success: true });
+    return NextResponse.json({ enqueued: true });
   } catch (err) {
     console.error("Error procesando imagen:", err);
     return NextResponse.json(
