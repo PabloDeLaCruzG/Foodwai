@@ -8,6 +8,11 @@ export async function POST(req: NextRequest) {
   try {
     await connectDB();
 
+    console.log("🔐 Claves QStash:", {
+      current: process.env.QSTASH_CURRENT_SIGNING_KEY,
+      next: process.env.QSTASH_NEXT_SIGNING_KEY,
+    });
+
     const token = req.cookies.get("token")?.value;
     if (!token) {
       return NextResponse.json(
