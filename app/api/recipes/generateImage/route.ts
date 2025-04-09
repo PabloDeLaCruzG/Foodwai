@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
 
     await qstash.publishJSON({
       //url: `${process.env.BASE_URL}/api/process-image`,
-      url: "https://foodwai.vercel.app/api/process-image",
+      url: "https://foodwai.vercel.app/api/recipes/process-image",
       body: {
         recipeId,
         userId,
