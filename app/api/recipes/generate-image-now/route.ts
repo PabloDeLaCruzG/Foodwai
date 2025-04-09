@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     );
     console.log("🖼️ Imagen generada:", imageUrl);
 
-    fetch("https://foodwai.vercel.app/api/recipes/generate-image-worker", {
+    fetch("https://foodwai.onrender.com/api/recipes/generate-image-worker", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

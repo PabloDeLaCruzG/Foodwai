@@ -40,11 +40,11 @@ export async function POST(req: NextRequest) {
     console.log("Enviando a QStash:", {
       recipeId,
       userId,
-      endpoint: "https://foodwai.vercel.app/api/recipes/process-image",
+      endpoint: "https://foodwai.onrender.com/api/recipes/process-image",
     });
 
     await qstash.publishJSON({
-      url: "https://foodwai.vercel.app/api/recipes/process-image",
+      url: "https://foodwai.onrender.com/api/recipes/process-image",
       body: {
         recipeId,
         userId,

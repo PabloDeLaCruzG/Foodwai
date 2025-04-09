@@ -23,7 +23,7 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
     console.log("Receta encontrada:", recipe);
 
     // Llamada interna no bloqueante para generar imagen
-    fetch("https://foodwai.vercel.app/api/recipes/generate-image-now", {
+    fetch("https://foodwai.onrender.com/api/recipes/generate-image-now", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
