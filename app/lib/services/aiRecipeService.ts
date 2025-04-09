@@ -8,7 +8,7 @@ export class AIRecipeService {
     const userLanguage = navigator.language;
     try {
       const response = await openai.chat.completions.create({
-        model: "gpt-3.5-turbo",
+        model: "gpt-3.5-turbo-1106",
         messages: [
           {
             role: "system",
@@ -20,6 +20,7 @@ export class AIRecipeService {
             content: `Idioma: ${userLanguage || "es"}. ${prompt}`,
           },
         ],
+        temperature: 0.5,
       });
 
       const aiResult = response.choices[0]?.message?.content?.trim();
@@ -67,9 +68,10 @@ export class AIRecipeService {
       const stepsString = steps.map((s) => s.description).join(". ");
 
       const response = await openai.images.generate({
-        prompt: `Foto realista y profesional del plato: ${recipeTitle}, que lleva: ${ingString}. Elaboración con pasos: ${stepsString}. Iluminación natural, alta resolución.`,
+        prompt: `Foto realista y profesional del plato: ${recipeTitle}, que lleva: ${ingString}. Elaboración: ${stepsString}. Fondo neutro, buena iluminación.`,
         n: 1,
-        size: "512x512",
+        size: "256x256", // más rápido que 512x512
+        response_format: "url",
       });
 
       if (!response.data || !response.data[0].url) {
