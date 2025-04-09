@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     });
 
     await fetch(
-      "https://qstash.upstash.io/v1/publish/https://foodwai.vercel.app/api/recipes/process-image",
+      "https://qstash.upstash.io/v1/publish/aHR0cHM6Ly9mb29kd2FpLnZlcmNlbC5hcHAvYXBpL3JlY2lwZXMvcHJvY2Vzcy1pbWFnZQ==", // Base64 de la URL destino
       {
         method: "POST",
         headers: {
