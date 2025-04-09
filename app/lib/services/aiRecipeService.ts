@@ -87,11 +87,16 @@ export class AIRecipeService {
         throw new Error("No se pudo generar la imagen.");
       }
 
+      console.log("Response GPT Image", response)
+
       const openaiImageUrl = response.data[0].url;
       const imageBuffer = await axios
         .get(openaiImageUrl, { responseType: "arraybuffer" })
         .then((res) => Buffer.from(res.data, "binary"));
       const uploaded = await this.uploadToCloudinary(imageBuffer);
+
+      console.log("Uploaded Cloudinary", uploaded)
+
       return uploaded;
     } catch (error) {
       console.error("Error al generar imagen con OpenAI:", error);
