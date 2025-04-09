@@ -31,12 +31,20 @@ export async function POST(req: NextRequest) {
       token: process.env.QSTASH_TOKEN!,
     });
 
-    await qstash.publishJSON({
-      //url: `${process.env.BASE_URL}/api/process-image`,
+    console.log("Enviando a QStash:", {
+      recipeId,
+      userId,
+      endpoint: "https://foodwai.vercel.app/api/recipes/process-image",
+    });
+    
+    await qstash.publish({
       url: "https://foodwai.vercel.app/api/recipes/process-image",
-      body: {
+      body: JSON.stringify({
         recipeId,
         userId,
+      }),
+      headers: {
+        "Content-Type": "application/json",
       },
     });
 
