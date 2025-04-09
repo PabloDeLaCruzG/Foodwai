@@ -3,15 +3,11 @@ import { connectDB } from "@/app/lib/db";
 // import Recipe from "@/app/lib/models/Recipe";
 import jwt from "jsonwebtoken";
 // import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
+import { Client } from "@upstash/qstash";
 
 export async function POST(req: NextRequest) {
   try {
     await connectDB();
-
-    console.log("🔐 Claves QStash:", {
-      current: process.env.QSTASH_CURRENT_SIGNING_KEY,
-      next: process.env.QSTASH_NEXT_SIGNING_KEY,
-    });
 
     const token = req.cookies.get("token")?.value;
     if (!token) {
@@ -31,26 +27,29 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Falta recipeId" }, { status: 400 });
     }
 
+    const qstash = new Client({
+      token: process.env.QSTASH_TOKEN!,
+    });
+
+    console.log("🔐 Claves QStash:", {
+      current: process.env.QSTASH_CURRENT_SIGNING_KEY,
+      next: process.env.QSTASH_NEXT_SIGNING_KEY,
+      token: process.env.QSTASH_TOKEN!,
+    });
+
     console.log("Enviando a QStash:", {
       recipeId,
       userId,
       endpoint: "https://foodwai.vercel.app/api/recipes/process-image",
     });
 
-    await fetch(
-      "https://qstash.upstash.io/v1/publish/https://foodwai.vercel.app/api/recipes/process-image",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${process.env.QSTASH_TOKEN!}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          recipeId,
-          userId,
-        }),
-      }
-    );
+    await qstash.publishJSON({
+      url: "https://foodwai.vercel.app/api/recipes/process-image",
+      body: {
+        recipeId,
+        userId,
+      },
+    });
 
     return NextResponse.json({ message: "Imagen en proceso" }, { status: 202 });
 
