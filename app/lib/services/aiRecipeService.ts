@@ -5,7 +5,6 @@ import axios from "axios";
 
 export class AIRecipeService {
   static async generateRecipeFromPrompt(prompt: string): Promise<AIRecipeData> {
-    const userLanguage = navigator.language;
     try {
       const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo-1106",
@@ -17,7 +16,7 @@ export class AIRecipeService {
           },
           {
             role: "user",
-            content: `Idioma: ${userLanguage || "es"}. ${prompt}`,
+            content: `Idioma: es. ${prompt}`,
           },
         ],
         temperature: 0.5,

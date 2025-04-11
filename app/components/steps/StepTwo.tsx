@@ -39,97 +39,100 @@ export default function StepTwo({
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">
-          Add ingredients to exclude or include
+          Personaliza los ingredientes de tu receta
         </h1>
         <p className="text-gray-600">
-          Type any ingredient you want in or out of your recipe.
+          Opcionalmente, puedes especificar ingredientes que te gustaría incluir
+          o excluir en tu receta.
         </p>
       </div>
 
-      {/* Include */}
+      {/* Incluir ingredientes */}
       <div>
-        <h2 className="font-semibold mb-2">Include</h2>
+        <h2 className="font-semibold mb-2">Ingredientes a incluir</h2>
         <div className="flex items-center gap-2 mb-3">
           <input
-            className="border border-gray-300 p-2 rounded-md flex-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="flex-1 border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             value={inputInclude}
             onChange={(e) => setInputInclude(e.target.value)}
-            placeholder="e.g. chicken, tomatoes..."
+            onKeyPress={(e) => e.key === "Enter" && handleAddInclude()}
+            placeholder="ej: pollo, tomates..."
           />
           <button
             onClick={handleAddInclude}
-            className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+            className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors disabled:bg-gray-300"
+            disabled={!inputInclude.trim()}
           >
-            Add
+            Agregar
           </button>
         </div>
 
-        {/* Chips de ingredientes a incluir */}
         <div className="flex flex-wrap gap-2">
           {ingredientsToInclude.map((ingredient, idx) => (
             <span
               key={idx}
-              className="inline-flex items-center bg-orange-100 text-orange-600 px-3 py-1 rounded-full cursor-pointer hover:bg-orange-200"
+              className="inline-flex items-center bg-orange-100 text-orange-600 px-3 py-1 rounded-full cursor-pointer hover:bg-orange-200 transition-colors"
               onClick={() =>
                 setIngredientsToInclude(
                   ingredientsToInclude.filter((i) => i !== ingredient)
                 )
               }
             >
-              {ingredient} <span className="ml-2 text-sm">×</span>
+              {ingredient}
+              <span className="ml-2 text-sm hover:text-orange-800">×</span>
             </span>
           ))}
         </div>
       </div>
 
-      {/* Exclude */}
+      {/* Excluir ingredientes */}
       <div>
-        <h2 className="font-semibold mb-2">Exclude</h2>
+        <h2 className="font-semibold mb-2">Ingredientes a excluir</h2>
         <div className="flex items-center gap-2 mb-3">
           <input
-            className="border border-gray-300 p-2 rounded-md flex-1 focus:outline-none focus:ring-2 focus:ring-orange-500"
+            className="flex-1 border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
             value={inputExclude}
             onChange={(e) => setInputExclude(e.target.value)}
-            placeholder="e.g. cilantro, olives..."
+            onKeyPress={(e) => e.key === "Enter" && handleAddExclude()}
+            placeholder="ej: mariscos, nueces..."
           />
           <button
             onClick={handleAddExclude}
-            className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600"
+            className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors disabled:bg-gray-300"
+            disabled={!inputExclude.trim()}
           >
-            Add
+            Agregar
           </button>
         </div>
 
-        {/* Chips de ingredientes a excluir */}
         <div className="flex flex-wrap gap-2">
           {ingredientsToExclude.map((ingredient, idx) => (
             <span
               key={idx}
-              className="inline-flex items-center bg-red-100 text-red-600 px-3 py-1 rounded-full cursor-pointer hover:bg-red-200"
+              className="inline-flex items-center bg-red-100 text-red-600 px-3 py-1 rounded-full cursor-pointer hover:bg-red-200 transition-colors"
               onClick={() =>
                 setIngredientsToExclude(
                   ingredientsToExclude.filter((i) => i !== ingredient)
                 )
               }
             >
-              {ingredient} <span className="ml-2 text-sm">×</span>
+              {ingredient}
+              <span className="ml-2 text-sm hover:text-red-800">×</span>
             </span>
           ))}
         </div>
       </div>
 
-      {/* EXTRA ALLERGENS FIELD */}
+      {/* Alergias adicionales */}
       <div>
-        <label className="block font-semibold mb-2" htmlFor="extraAllergens">
-          Additional allergens or restrictions
-        </label>
-        <input
-          id="extraAllergens"
-          type="text"
-          placeholder="e.g. peanut allergy, shellfish allergy..."
+        <h2 className="font-semibold mb-2">
+          Alergias o intolerancias adicionales
+        </h2>
+        <textarea
           value={extraAllergens}
           onChange={(e) => setExtraAllergens(e.target.value)}
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
+          placeholder="Describe cualquier alergia o intolerancia adicional que debamos tener en cuenta..."
+          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[100px]"
         />
       </div>
     </div>
