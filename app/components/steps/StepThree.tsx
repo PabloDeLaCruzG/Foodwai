@@ -26,230 +26,286 @@ export default function StepThree({
     <div className="space-y-8">
       <div className="space-y-2">
         <h1 className="text-2xl font-bold">
-          Let’s get started with some details
+          Personaliza los detalles de tu receta
         </h1>
         <p className="text-gray-600">
-          Estimate time, difficulty, cost and number of servings.
+          Ajusta estas opciones según tus preferencias. Todas son configurables
+          y tienen valores predeterminados.
         </p>
       </div>
 
-      {/* TIME */}
+      {/* TIEMPO */}
       <div className="space-y-2">
-        <h2 className="font-semibold">Estimate preparation time</h2>
+        <h2 className="font-semibold">Tiempo estimado de preparación</h2>
         <div className="flex flex-col gap-2">
-          {/* Quick */}
+          {/* Rápido */}
           <label
-            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50 
-              ${
-                time === "quick"
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }
-            `}
+            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+              time === "quick"
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
               name="time"
               value="quick"
               checked={time === "quick"}
-              onChange={() => setTime("quick")}
-              className="mr-2"
+              onChange={(e) => setTime(e.target.value)}
+              className="hidden"
             />
-            <span className="font-medium">Quick (30 minutes or less)</span>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-medium">Rápido</span>
+                <p className="text-sm text-gray-600">15-30 minutos</p>
+              </div>
+              <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                {time === "quick" && (
+                  <div className="w-3 h-3 bg-orange-500 rounded-full" />
+                )}
+              </div>
+            </div>
           </label>
 
-          {/* Medium */}
+          {/* Medio */}
           <label
-            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50 
-              ${
-                time === "medium"
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }
-            `}
+            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+              time === "medium"
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
               name="time"
               value="medium"
               checked={time === "medium"}
-              onChange={() => setTime("medium")}
-              className="mr-2"
+              onChange={(e) => setTime(e.target.value)}
+              className="hidden"
             />
-            <span className="font-medium">Medium (30-60 minutes)</span>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-medium">Medio</span>
+                <p className="text-sm text-gray-600">30-60 minutos</p>
+              </div>
+              <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                {time === "medium" && (
+                  <div className="w-3 h-3 bg-orange-500 rounded-full" />
+                )}
+              </div>
+            </div>
           </label>
 
-          {/* Long */}
+          {/* Largo */}
           <label
-            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50 
-              ${
-                time === "long"
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }
-            `}
+            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+              time === "long"
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
               name="time"
               value="long"
               checked={time === "long"}
-              onChange={() => setTime("long")}
-              className="mr-2"
+              onChange={(e) => setTime(e.target.value)}
+              className="hidden"
             />
-            <span className="font-medium">Long (60+ minutes)</span>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-medium">Largo</span>
+                <p className="text-sm text-gray-600">Más de 60 minutos</p>
+              </div>
+              <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                {time === "long" && (
+                  <div className="w-3 h-3 bg-orange-500 rounded-full" />
+                )}
+              </div>
+            </div>
           </label>
         </div>
       </div>
 
-      {/* DIFFICULTY */}
+      {/* DIFICULTAD */}
       <div className="space-y-2">
-        <h2 className="font-semibold">Difficulty level</h2>
+        <h2 className="font-semibold">Nivel de dificultad</h2>
         <div className="flex flex-col gap-2">
+          {/* Básico */}
           <label
-            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50
-              ${
-                difficulty === "basic"
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }
-            `}
+            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+              difficulty === "basic"
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
               name="difficulty"
               value="basic"
               checked={difficulty === "basic"}
-              onChange={() => setDifficulty("basic")}
-              className="mr-2"
+              onChange={(e) => setDifficulty(e.target.value)}
+              className="hidden"
             />
-            <span className="font-medium">
-              Basic (Easy, minimal ingredients)
-            </span>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-medium">Básico</span>
+                <p className="text-sm text-gray-600">Para principiantes</p>
+              </div>
+              <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                {difficulty === "basic" && (
+                  <div className="w-3 h-3 bg-orange-500 rounded-full" />
+                )}
+              </div>
+            </div>
           </label>
 
+          {/* Intermedio */}
           <label
-            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50
-              ${
-                difficulty === "intermediate"
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }
-            `}
+            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+              difficulty === "intermediate"
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
               name="difficulty"
               value="intermediate"
               checked={difficulty === "intermediate"}
-              onChange={() => setDifficulty("intermediate")}
-              className="mr-2"
+              onChange={(e) => setDifficulty(e.target.value)}
+              className="hidden"
             />
-            <span className="font-medium">
-              Intermediate (Requires some cooking skills)
-            </span>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-medium">Intermedio</span>
+                <p className="text-sm text-gray-600">
+                  Algunas técnicas más avanzadas
+                </p>
+              </div>
+              <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                {difficulty === "intermediate" && (
+                  <div className="w-3 h-3 bg-orange-500 rounded-full" />
+                )}
+              </div>
+            </div>
           </label>
 
+          {/* Avanzado */}
           <label
-            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50
-              ${
-                difficulty === "advanced"
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }
-            `}
+            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50 transition-colors ${
+              difficulty === "advanced"
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
               name="difficulty"
               value="advanced"
               checked={difficulty === "advanced"}
-              onChange={() => setDifficulty("advanced")}
-              className="mr-2"
+              onChange={(e) => setDifficulty(e.target.value)}
+              className="hidden"
             />
-            <span className="font-medium">
-              Advanced (Techniques and tools are required)
-            </span>
+            <div className="flex items-center justify-between">
+              <div>
+                <span className="font-medium">Avanzado</span>
+                <p className="text-sm text-gray-600">
+                  Para cocineros experimentados
+                </p>
+              </div>
+              <div className="w-6 h-6 rounded-full border-2 flex items-center justify-center">
+                {difficulty === "advanced" && (
+                  <div className="w-3 h-3 bg-orange-500 rounded-full" />
+                )}
+              </div>
+            </div>
           </label>
         </div>
       </div>
 
-      {/* COST */}
+      {/* COSTO */}
       <div className="space-y-2">
-        <h2 className="font-semibold">Cost</h2>
-        <div className="flex flex-col gap-2">
+        <h2 className="font-semibold">Nivel de costo</h2>
+        <div className="flex gap-4">
           <label
-            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50
-              ${
-                cost === "low"
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }
-            `}
+            className={`flex-1 border rounded-md p-3 cursor-pointer hover:bg-gray-50 text-center transition-colors ${
+              cost === "low"
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
               name="cost"
               value="low"
               checked={cost === "low"}
-              onChange={() => setCost("low")}
-              className="mr-2"
+              onChange={(e) => setCost(e.target.value)}
+              className="hidden"
             />
-            <span className="font-medium">Low</span>
+            <span className="font-medium">Económico</span>
           </label>
 
           <label
-            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50
-              ${
-                cost === "medium"
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }
-            `}
+            className={`flex-1 border rounded-md p-3 cursor-pointer hover:bg-gray-50 text-center transition-colors ${
+              cost === "medium"
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
               name="cost"
               value="medium"
               checked={cost === "medium"}
-              onChange={() => setCost("medium")}
-              className="mr-2"
+              onChange={(e) => setCost(e.target.value)}
+              className="hidden"
             />
-            <span className="font-medium">Medium</span>
+            <span className="font-medium">Moderado</span>
           </label>
 
           <label
-            className={`border rounded-md p-3 cursor-pointer hover:bg-gray-50
-              ${
-                cost === "high"
-                  ? "border-orange-500 bg-orange-50"
-                  : "border-gray-300"
-              }
-            `}
+            className={`flex-1 border rounded-md p-3 cursor-pointer hover:bg-gray-50 text-center transition-colors ${
+              cost === "high"
+                ? "border-orange-500 bg-orange-50"
+                : "border-gray-300"
+            }`}
           >
             <input
               type="radio"
               name="cost"
               value="high"
               checked={cost === "high"}
-              onChange={() => setCost("high")}
-              className="mr-2"
+              onChange={(e) => setCost(e.target.value)}
+              className="hidden"
             />
-            <span className="font-medium">High</span>
+            <span className="font-medium">Premium</span>
           </label>
         </div>
       </div>
 
-      {/* SERVINGS */}
+      {/* PORCIONES */}
       <div className="space-y-2">
-        <h2 className="font-semibold">Number of servings</h2>
-        <input
-          type="number"
-          min={1}
-          value={servings}
-          onChange={(e) => setServings(Number(e.target.value))}
-          className="border border-gray-300 p-2 rounded-md w-24 focus:outline-none focus:ring-2 focus:ring-orange-500"
-        />
+        <h2 className="font-semibold">Número de porciones</h2>
+        <div className="flex items-center gap-4">
+          <button
+            onClick={() => setServings(Math.max(1, servings - 1))}
+            className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+            type="button"
+          >
+            -
+          </button>
+          <span className="text-xl font-medium w-8 text-center">
+            {servings}
+          </span>
+          <button
+            onClick={() => setServings(Math.min(12, servings + 1))}
+            className="w-10 h-10 rounded-full border border-gray-300 flex items-center justify-center hover:bg-gray-100 transition-colors"
+            type="button"
+          >
+            +
+          </button>
+        </div>
       </div>
     </div>
   );

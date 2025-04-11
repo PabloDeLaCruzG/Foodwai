@@ -1,4 +1,3 @@
-// components/StepIndicator.tsx
 "use client";
 import React from "react";
 
@@ -11,59 +10,63 @@ export default function StepIndicator({
   currentStep,
   steps,
 }: StepIndicatorProps) {
-  const totalSteps = steps.length;
-  // Calcula el ancho de la línea de progreso en porcentaje
-  const progressWidth =
-    totalSteps > 1 ? ((currentStep - 1) / (totalSteps - 1)) * 100 : 0;
-
   return (
-    <div className="relative w-full max-w-2xl mb-8">
-      {/* Línea de fondo completa */}
-      <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-300" />
-      {/* Línea de progreso (se alarga dinámicamente) */}
-      <div
-        className="absolute top-4 left-0 h-0.5 bg-orange-500"
-        style={{ width: `${progressWidth}%` }}
-      />
-      <div className="flex justify-between relative">
-        {steps.map((label, index) => {
-          const stepIndex = index + 1;
-          const isActive = stepIndex === currentStep;
-          const isCompleted = stepIndex < currentStep;
-          return (
-            <div key={label} className="flex flex-col items-center">
+    <div className="relative px-4">
+      <div className="overflow-hidden">
+        {/* Líneas base y de progreso */}
+        <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-200" />
+        <div
+          className="absolute top-4 left-0 h-0.5 bg-orange-500 transition-all duration-500"
+          style={{
+            width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
+          }}
+        />
+
+        {/* Círculos y etiquetas */}
+        <div className="relative flex justify-between">
+          {steps.map((label, idx) => (
+            <div key={idx} className="relative flex flex-col items-center">
               <div
-                className={`flex items-center justify-center w-8 h-8 rounded-full border-2
-                  ${
-                    isCompleted
-                      ? "bg-orange-500 border-orange-500"
-                      : isActive
-                      ? "bg-white border-orange-500"
-                      : "bg-white border-gray-300"
-                  }
-                `}
+                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
+                  idx + 1 === currentStep
+                    ? "border-orange-500 bg-orange-50 text-orange-500"
+                    : idx + 1 < currentStep
+                    ? "border-orange-500 bg-orange-500 text-white"
+                    : "border-gray-300 bg-white text-gray-300"
+                }`}
               >
-                {isCompleted ? (
-                  <span className="text-white font-bold">{stepIndex}</span>
-                ) : isActive ? (
-                  <span className="text-orange-500 font-bold">{stepIndex}</span>
+                {idx + 1 < currentStep ? (
+                  <svg
+                    className="w-5 h-5"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2.5}
+                      d="M5 13l4 4L19 7"
+                    />
+                  </svg>
                 ) : (
-                  <span className="text-gray-500 font-bold">{stepIndex}</span>
+                  <span className="text-sm">{idx + 1}</span>
                 )}
               </div>
-              {/* Texto visible solo en pantallas medianas o superiores */}
               <span
-                className={`mt-2 text-sm hidden md:block ${
-                  isActive || isCompleted
-                    ? "text-orange-600 font-semibold"
-                    : "text-gray-600"
+                className={`absolute -bottom-6 text-xs transform -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
+                  idx + 1 === currentStep
+                    ? "text-orange-500 font-medium scale-110"
+                    : idx + 1 < currentStep
+                    ? "text-gray-500"
+                    : "text-gray-400"
                 }`}
               >
                 {label}
               </span>
             </div>
-          );
-        })}
+          ))}
+        </div>
       </div>
     </div>
   );

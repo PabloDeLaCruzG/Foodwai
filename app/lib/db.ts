@@ -2,16 +2,23 @@ import mongoose from "mongoose";
 
 export const connectDB = async () => {
   try {
+    console.log("🔄 Iniciando conexión a MongoDB...");
     const uri = process.env.MONGODB_URL;
+
     if (!uri) {
-      throw new Error("⚠️ MONGODB_URL no está definida en el entorno");
+      console.error("❌ MONGODB_URL no está definida en el entorno");
+      throw new Error("MONGODB_URL no está definida");
     }
 
-    const connection = await mongoose.connect(uri);
-    const url = `${connection.connection.host}:${connection.connection.port}`;
-    console.log(`MongoDB connected to ${url}`);
+    if (mongoose.connection.readyState === 1) {
+      console.log("✅ Ya existe una conexión activa a MongoDB");
+      return;
+    }
+
+    await mongoose.connect(uri);
+    console.log(`✅ MongoDB conectado exitosamente en ${process.env.NODE_ENV}`);
   } catch (error) {
-    console.error("Error connecting to MongoDB:", error);
-    process.exit(1);
+    console.error("❌ Error conectando a MongoDB:", error);
+    throw error;
   }
 };

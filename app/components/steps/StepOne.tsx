@@ -10,37 +10,42 @@ interface StepOneProps {
 
 // Ejemplo de arrays
 const CUISINE_OPTIONS = [
-  "Italian",
-  "Mexican",
-  "Chinese",
-  "Indian",
-  "Japanese",
-  "American",
-  "Thai",
-  "Vietnamese",
-  "Korean",
-  "French",
-  "Greek",
-  "Spanish",
-  "German",
-  "British", // etc...
+  "Italiana",
+  "Mexicana",
+  "China",
+  "India",
+  "Japonesa",
+  "Americana",
+  "Tailandesa",
+  "Vietnamita",
+  "Coreana",
+  "Francesa",
+  "Griega",
+  "Española",
+  "Alemana",
+  "Mediterránea",
+  "Peruana",
+  "Argentina",
+  "Brasileña",
+  "Marroquí",
 ];
 
 const DIET_OPTIONS = [
-  "Vegetarian",
-  "Vegan",
-  "Gluten-Free",
-  "Dairy-Free",
-  "Pescatarian",
+  "Vegetariana",
+  "Vegana",
+  "Sin Gluten",
+  "Sin Lácteos",
+  "Pescetariana",
   "Paleo",
-  "Low-Carb",
-  "Keto",
-  "Nut-Free",
-  "Soy-Free",
-  "No Sugar Added",
-  "Mediterranean",
+  "Baja en Carbohidratos",
+  "Cetogénica",
+  "Sin Frutos Secos",
+  "Sin Soja",
+  "Sin Azúcar Añadido",
+  "Mediterránea",
   "DASH",
-  "Weight Watchers",
+  "Sin Huevo",
+  "Sin Mariscos",
 ];
 
 export default function StepOne({
@@ -69,62 +74,50 @@ export default function StepOne({
   return (
     <div className="space-y-8">
       <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Find the perfect recipe</h1>
+        <h1 className="text-2xl font-bold">¿Qué tipo de cocina te gustaría?</h1>
         <p className="text-gray-600">
-          Choose one or more cuisines and dietary restrictions to tailor your
-          recipe.
+          Puedes seleccionar los tipos de cocina que prefieras y especificar
+          cualquier restricción dietética.
         </p>
       </div>
 
-      {/* CUISINE TYPE */}
+      {/* Tipos de cocina */}
       <div>
-        <h2 className="font-semibold mb-4">Cuisine type</h2>
-        <div className="flex flex-wrap gap-3">
-          {CUISINE_OPTIONS.map((cuisine) => {
-            const isActive = selectedCuisines.includes(cuisine);
-            return (
-              <button
-                key={cuisine}
-                type="button"
-                onClick={() => toggleCuisine(cuisine)}
-                className={`px-4 py-2 rounded-full border 
-                  ${
-                    isActive
-                      ? "bg-orange-500 text-white border-orange-500"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }
-                `}
-              >
-                {cuisine}
-              </button>
-            );
-          })}
+        <h2 className="font-semibold mb-4">Tipos de Cocina</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {CUISINE_OPTIONS.map((cuisine) => (
+            <button
+              key={cuisine}
+              onClick={() => toggleCuisine(cuisine)}
+              className={`p-3 rounded-lg text-sm transition-all transform hover:scale-105 ${
+                selectedCuisines.includes(cuisine)
+                  ? "bg-orange-100 text-orange-700 border-2 border-orange-500"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {cuisine}
+            </button>
+          ))}
         </div>
       </div>
 
-      {/* DIETARY RESTRICTIONS */}
+      {/* Restricciones dietéticas */}
       <div>
-        <h2 className="font-semibold mb-4">Dietary restrictions</h2>
-        <div className="flex flex-wrap gap-3">
-          {DIET_OPTIONS.map((diet) => {
-            const isActive = dietRestrictions.includes(diet);
-            return (
-              <button
-                key={diet}
-                type="button"
-                onClick={() => toggleDiet(diet)}
-                className={`px-4 py-2 rounded-full border 
-                  ${
-                    isActive
-                      ? "bg-orange-500 text-white border-orange-500"
-                      : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
-                  }
-                `}
-              >
-                {diet}
-              </button>
-            );
-          })}
+        <h2 className="font-semibold mb-4">Restricciones Dietéticas</h2>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+          {DIET_OPTIONS.map((diet) => (
+            <button
+              key={diet}
+              onClick={() => toggleDiet(diet)}
+              className={`p-3 rounded-lg text-sm transition-all transform hover:scale-105 ${
+                dietRestrictions.includes(diet)
+                  ? "bg-green-100 text-green-700 border-2 border-green-500"
+                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+              }`}
+            >
+              {diet}
+            </button>
+          ))}
         </div>
       </div>
     </div>

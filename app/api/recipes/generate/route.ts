@@ -8,6 +8,7 @@ import jwt from "jsonwebtoken";
 
 export async function POST(req: NextRequest) {
   try {
+    console.log("🟢 Iniciando generación de receta");
     await connectDB();
 
     const token = req.cookies.get("token")?.value;
@@ -52,6 +53,8 @@ export async function POST(req: NextRequest) {
     }
     await user.save();
 
+    console.log("✅ Verificación de usuario y créditos completada");
+
     const bodyData = await req.json();
     const {
       selectedCuisines,
@@ -72,7 +75,6 @@ export async function POST(req: NextRequest) {
     const includeStr = ingredientsToInclude?.join(", ") || "none";
     const excludeStr = ingredientsToExclude?.join(", ") || "none";
 
-    // Construimos el prompt de forma concisa
     const prompt = `
       Genera una receta que cumpla con los siguientes parámetros:
       Tipos de cocina: ${cuisinesStr}
@@ -88,7 +90,7 @@ export async function POST(req: NextRequest) {
       Detalles extra: ${extraDetails || "ninguno"}
 
       Devuelve un JSON ESTRICTAMENTE válido con la siguiente estructura:
-        {
+      {
         "title": "string",
         "description": "string",
         "cookingTime": 30,
@@ -103,69 +105,61 @@ export async function POST(req: NextRequest) {
         },
         "ingredients": [
           {
-            "name": "Ingrediente 1",
-            "quantity": 100 (Si es al gusto pon un 1),
-            "unit": "g" (Si es al gusto pon al gusto)
+            "name": "string",
+            "quantity": 100,
+            "unit": "string"
           }
         ],
         "steps": [
           {
             "stepNumber": 1,
-            "description": "Descripción detallada del paso"
+            "description": "string"
           }
         ]
       }
     `;
 
-    console.log("PROMPT ENVIADO A OPENAI:", prompt);
+    console.log("📝 Prompt preparado, llamando a OpenAI");
 
-    // Generar la receta
-    const recipeData = await AIRecipeService.generateRecipeFromPrompt(prompt);
+    try {
+      const recipeData = await AIRecipeService.generateRecipeFromPrompt(prompt);
+      console.log("✅ Receta generada por OpenAI");
 
-    console.log("RECETA:", recipeData);
+      const newRecipe = new Recipe({
+        ...recipeData,
+        imageUrl: null,
+        authorId: userId,
+      });
 
-    // Guardar receta
-    const newRecipe = new Recipe({
-      ...recipeData,
-      imageUrl: null, // la imagen se genera en otro endpoint
-      authorId: userId,
-    });
+      await newRecipe.save();
+      console.log("✅ Receta guardada en la base de datos");
 
-    await newRecipe.save();
-
-    return NextResponse.json(
-      {
-        message: "Receta generada exitosamente",
-        recipe: newRecipe,
-      },
-      { status: 201 }
-    );
-  } catch (error: unknown) {
-    console.error("Error en el endpoint /api/recipes/generate:", error);
-
-    // Si es error de axios con response
-    if (
-      typeof error === "object" &&
-      error !== null &&
-      "response" in error &&
-      typeof (error as Record<string, unknown>).response === "object"
-    ) {
-      const responseData = (error as { response: { data: unknown } }).response
-        .data;
-      console.error("Respuesta del modelo:", responseData);
       return NextResponse.json(
         {
-          message: "Error en el servicio de generación",
-          details: responseData,
+          message: "Receta generada exitosamente",
+          recipe: newRecipe,
         },
-        { status: 502 }
+        { status: 201 }
+      );
+    } catch (openaiError) {
+      console.error("❌ Error con OpenAI:", openaiError);
+      return NextResponse.json(
+        {
+          message: "Error al generar la receta con OpenAI",
+          error:
+            openaiError instanceof Error
+              ? openaiError.message
+              : "Error desconocido",
+        },
+        { status: 500 }
       );
     }
-
+  } catch (error) {
+    console.error("❌ Error general en la generación:", error);
     return NextResponse.json(
       {
         message: "Error inesperado al generar la receta",
-        error: error instanceof Error ? error.message : "Unknown error",
+        error: error instanceof Error ? error.message : "Error desconocido",
       },
       { status: 500 }
     );
