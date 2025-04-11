@@ -1,5 +1,12 @@
 import axios from "axios";
 import { GenerateRecipeBody, IRecipe, IUser } from "./interfaces";
+import config from "./config";
+
+// Configurar axios para usar la URL base según el entorno
+const api = axios.create({
+  baseURL: config.apiUrl,
+  withCredentials: true
+});
 
 export const recipeApi = {
   /**
@@ -8,7 +15,7 @@ export const recipeApi = {
    */
   getAllRecipes: async (): Promise<IRecipe[]> => {
     try {
-      const response = await axios.get("/api/recipes");
+      const response = await api.get("/api/recipes");
       return response.data;
     } catch (error) {
       console.error("Error al obtener todas las recetas:", error);
@@ -18,11 +25,8 @@ export const recipeApi = {
 
   getRecipesByAuthor: async (authorId: string): Promise<IRecipe[]> => {
     try {
-      const response = await axios.get("/api/recipes/author", {
-        params: {
-          authorId,
-        },
-        withCredentials: true,
+      const response = await api.get("/api/recipes/author", {
+        params: { authorId }
       });
       return response.data;
     } catch (error) {
@@ -37,9 +41,7 @@ export const recipeApi = {
    */
   getRecipeById: async (id: string): Promise<IRecipe> => {
     try {
-      const response = await axios.get("/api/recipes/" + id, {
-        withCredentials: true,
-      });
+      const response = await api.get(`/api/recipes/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error al obtener la receta con ID ${id}:`, error);
@@ -53,9 +55,7 @@ export const recipeApi = {
    */
   deleteRecipeById: async (id: string) => {
     try {
-      const response = await axios.delete("/api/recipes/" + id, {
-        withCredentials: true,
-      });
+      const response = await api.delete(`/api/recipes/${id}`);
       return response.data;
     } catch (error) {
       console.error(`Error al eliminar la receta con ID ${id}:`, error);
@@ -69,9 +69,7 @@ export const recipeApi = {
    */
   createRecipe: async (recipe: IRecipe) => {
     try {
-      const response = await axios.post("/api/recipes", recipe, {
-        withCredentials: true,
-      });
+      const response = await api.post("/api/recipes", recipe);
       return response.data;
     } catch (error) {
       console.error("Error al crear la receta:", error);
@@ -85,11 +83,10 @@ export const recipeApi = {
    */
   generateRecipe: async (recipeParams: GenerateRecipeBody) => {
     try {
-      const response = await axios.post("/api/recipes/generate", recipeParams, {
+      const response = await api.post("/api/recipes/generate", recipeParams, {
         headers: {
-          "Content-Type": "application/json",
-        },
-        withCredentials: true,
+          "Content-Type": "application/json"
+        }
       });
       return response.data;
     } catch (error) {
@@ -100,14 +97,12 @@ export const recipeApi = {
 
   generateImageForRecipe: async (recipeId: string) => {
     try {
-      const response = await axios.post(
-        "/api/recipes/generateImage",
+      const response = await api.post("/api/recipes/generateImage", 
         { recipeId },
         {
           headers: {
-            "Content-Type": "application/json",
-          },
-          withCredentials: true,
+            "Content-Type": "application/json"
+          }
         }
       );
       return response.data;
@@ -121,13 +116,7 @@ export const recipeApi = {
 export const authApi = {
   googleAuth: async (idToken: string) => {
     try {
-      const response = await axios.post(
-        "/api/auth/googleAuth",
-        {
-          idToken,
-        },
-        { withCredentials: true }
-      );
+      const response = await api.post("/api/auth/googleAuth", { idToken });
       return response.data;
     } catch (error) {
       console.error("Error al iniciar sesión con Google:", error);
@@ -140,9 +129,7 @@ export const authApi = {
    */
   registerUser: async (user: IUser) => {
     try {
-      const response = await axios.post("/api/auth/register", user, {
-        withCredentials: true,
-      });
+      const response = await api.post("/api/auth/register", user);
       return response.data;
     } catch (error) {
       console.error("Error al registrar el usuario:", error);
@@ -156,10 +143,7 @@ export const authApi = {
    */
   loginUser: async (user: IUser) => {
     try {
-      const response = await axios.post("/api/auth/login", user, {
-        withCredentials: true,
-      });
-
+      const response = await api.post("/api/auth/login", user);
       return response.data;
     } catch (error) {
       console.error("Error al loginear el usuario:", error);
@@ -169,14 +153,7 @@ export const authApi = {
 
   logoutUser: async () => {
     try {
-      const response = await axios.post(
-        "/api/auth/logout",
-        {},
-        {
-          withCredentials: true,
-        }
-      );
-
+      const response = await api.post("/api/auth/logout", {});
       return response.data;
     } catch (error) {
       console.error("Error al cerrar sesión:", error);
@@ -190,9 +167,7 @@ export const authApi = {
    */
   checkEmailExists: async (email: string) => {
     try {
-      const response = await axios.post("/api/auth/checkEmailExists", {
-        email,
-      });
+      const response = await api.post("/api/auth/checkEmailExists", { email });
       return response.data;
     } catch (error) {
       console.error("Error al verificar el email:", error);
@@ -204,9 +179,7 @@ export const authApi = {
 export const userApi = {
   getCurrentUser: async () => {
     try {
-      const response = await axios.get("/api/users/user", {
-        withCredentials: true,
-      });
+      const response = await api.get("/api/users/user");
       return response.data;
     } catch (error) {
       console.error("Error al obtener el usuario:", error);
@@ -216,13 +189,7 @@ export const userApi = {
 
   watchAdReward: async () => {
     try {
-      const response = await axios.post(
-        "/api/users/watchAdReward",
-        {},
-        {
-          withCredentials: true,
-        }
-      );
+      const response = await api.post("/api/users/watchAdReward", {});
       return response.data;
     } catch (error) {
       console.error("Error al procesar la recompensa:", error);
@@ -232,9 +199,7 @@ export const userApi = {
 
   getDailyStatus: async () => {
     try {
-      const response = await axios.get("/api/users/dailyStatus", {
-        withCredentials: true,
-      });
+      const response = await api.get("/api/users/dailyStatus");
       return response.data;
     } catch (error) {
       console.error("Error al obtener el estado diario:", error);

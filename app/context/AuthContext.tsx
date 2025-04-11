@@ -8,6 +8,7 @@ import {
   useContext,
   ReactNode,
 } from "react";
+import config from "../lib/config";
 
 // Define la interfaz para el usuario
 interface IUser {
@@ -29,7 +30,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Puedes obtener el usuario desde localStorage, cookies o llamando a un endpoint
     axios
-      .get("/api/users/user", { withCredentials: true })
+      .get(`${config.apiUrl}/api/users/user`, { withCredentials: true })
       .then((response) => {
         setUser(response.data);
       })

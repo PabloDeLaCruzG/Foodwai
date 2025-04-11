@@ -2,6 +2,7 @@ import { verifySignatureAppRouter } from "@upstash/qstash/nextjs";
 import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
 import Recipe from "@/app/lib/models/Recipe";
+import config from "@/app/lib/config";
 
 export const POST = verifySignatureAppRouter(async (req: Request) => {
   console.log("📩 QStash ha llamado a /api/recipes/process-image");
@@ -23,7 +24,7 @@ export const POST = verifySignatureAppRouter(async (req: Request) => {
     console.log("Receta encontrada:", recipe);
 
     // Llamada interna no bloqueante para generar imagen
-    fetch("https://foodwai.onrender.com/api/recipes/generate-image-now", {
+    fetch(`${config.apiUrl}/api/recipes/generate-image-now`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

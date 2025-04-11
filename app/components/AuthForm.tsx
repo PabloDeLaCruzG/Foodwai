@@ -4,11 +4,8 @@ import { useState } from "react";
 import { authApi } from "../lib/data";
 import { useRouter } from "next/navigation";
 import axios from "axios";
-
 import { GoogleLogin } from "@react-oauth/google";
-
-// Se usaría para tener en cuenta el usuario en el landing, si está registrado mostrar su nombre en lugar del formulario de login
-// import { useAuth } from "../context/AuthContext";
+import { FaSpinner } from "react-icons/fa";
 
 export default function AuthForm() {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -20,16 +17,15 @@ export default function AuthForm() {
 
   const router = useRouter();
 
-  // const { setUser } = useAuth(); // Si deseas actualizar el usuario en un contexto
-
   const handleGoogleAuth = async (idToken: string) => {
+    setLoading(true);
     try {
       await authApi.googleAuth(idToken);
-      // setUser(res.user); // Si usas AuthContext
       router.push("/home");
-      console.log("Redirigiendo a /home...");
     } catch (error) {
       console.error("Error en autenticación con Google", error);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -41,12 +37,10 @@ export default function AuthForm() {
 
       if (res.exists) {
         if (res.authProvider === "google") {
-          // Opción A: mostrar un mensaje y forzar a usar Google
           setErrorMsg(
             "Esta cuenta está registrada con Google. Inicia sesión con Google."
           );
-
-          return; // Evitamos avanzar a la fase de password
+          return;
         } else {
           setMode("login");
         }
@@ -72,24 +66,13 @@ export default function AuthForm() {
     setErrorMsg(null);
     setLoading(true);
 
-    console.log("Enviando formulario", { email, password, mode });
-
     try {
       if (mode === "login") {
         await authApi.loginUser({ email, password });
-        console.log("Login OK");
-        // setUser(res.user);
       } else {
         await authApi.registerUser({ email, password });
-        console.log("Registro OK");
-        // setUser(res.user);
       }
-
-      // setTimeout(() => {
-      //   window.location.href = "/home";
-      // }, 300);
       router.push("/home");
-      console.log("Redirigiendo a /home...");
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMsg =
@@ -118,7 +101,6 @@ export default function AuthForm() {
       <div className="w-full flex items-center justify-center gap-2 mb-2">
         <GoogleLogin
           onSuccess={(credentialResponse) => {
-            // credentialResponse.credential es el idToken
             const idToken = credentialResponse.credential;
             if (idToken) {
               handleGoogleAuth(idToken);
@@ -152,7 +134,7 @@ export default function AuthForm() {
           }}
           className="border text-gray-900 rounded w-full py-2 px-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition"
           required
-          disabled={step === "password"}
+          disabled={step === "password" || loading}
         />
         {errorMsg && <p className="text-sm text-red-500 mt-1">{errorMsg}</p>}
 
@@ -160,9 +142,10 @@ export default function AuthForm() {
           <button
             type="button"
             onClick={checkEmail}
-            className="w-full bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition mt-4"
+            className="w-full bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition mt-4 flex items-center justify-center"
+            disabled={loading}
           >
-            Next
+            {loading ? <FaSpinner className="animate-spin mr-2" /> : "Next"}
           </button>
         )}
 
@@ -190,19 +173,22 @@ export default function AuthForm() {
                 onChange={(e) => setPassword(e.target.value)}
                 className="border text-gray-900 rounded w-full py-2 px-3 focus:outline-none focus:ring-2 focus:ring-orange-500 transition mb-3"
                 required
+                disabled={loading}
               />
             </div>
 
             <button
               type="submit"
-              className="w-full bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition mt-4"
+              className="w-full bg-orange-500 text-white py-2 px-4 rounded hover:bg-orange-600 transition mt-4 flex items-center justify-center"
               disabled={loading}
             >
-              {loading
-                ? "Cargando..."
-                : mode === "login"
-                  ? "Iniciar Sesión"
-                  : "Registrarse"}
+              {loading ? (
+                <FaSpinner className="animate-spin mr-2" />
+              ) : mode === "login" ? (
+                "Iniciar Sesión"
+              ) : (
+                "Registrarse"
+              )}
             </button>
           </>
         )}
@@ -217,6 +203,7 @@ export default function AuthForm() {
           setPassword("");
         }}
         className="text-sm text-gray-500 mt-4 hover:underline"
+        disabled={loading}
       >
         {mode === "register" ? "¿Ya tienes cuenta? Inicia sesión" : ""}
       </button>

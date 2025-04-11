@@ -2,6 +2,7 @@ import { connectDB } from "@/app/lib/db";
 import Recipe from "@/app/lib/models/Recipe";
 import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
 import { NextResponse } from "next/server";
+import config from "@/app/lib/config";
 
 export async function POST(req: Request) {
   try {
@@ -29,7 +30,7 @@ export async function POST(req: Request) {
     );
     console.log("🖼️ Imagen generada:", imageUrl);
 
-    fetch("https://foodwai.onrender.com/api/recipes/generate-image-worker", {
+    fetch(`${config.apiUrl}/api/recipes/generate-image-worker`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

@@ -4,6 +4,7 @@ import React, { useEffect, useState } from "react";
 import Link from "next/link";
 import { IRecipe } from "../lib/interfaces";
 import axios from "axios";
+import config from "../lib/config";
 
 export default function RecipeCard({
   recipe: initialRecipe,
@@ -17,7 +18,7 @@ export default function RecipeCard({
 
     const fetchUpdatedRecipe = async () => {
       try {
-        const { data } = await axios.get(`/api/recipes/${initialRecipe._id}`);
+        const { data } = await axios.get(`${config.apiUrl}/api/recipes/${initialRecipe._id}`);
         setRecipe(data);
 
         if (data.imageUrl && intervalId) {

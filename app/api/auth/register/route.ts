@@ -1,4 +1,3 @@
-// app/api/auth/register/route.ts
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
 import User from "@/app/lib/models/User"; // ajusta si tienes /models directamente en lib

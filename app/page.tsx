@@ -3,6 +3,7 @@
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import AuthForm from "./components/AuthForm";
 import FeatureSection from "./components/FeatureSection";
+import StatsSection from "./components/StatsSection";
 import Image from "next/image";
 
 export default function Landing() {
@@ -57,16 +58,35 @@ export default function Landing() {
           {/* Texto del Hero */}
           <div className="text-white max-w-lg md:flex-1">
             <h1 className="text-5xl font-bold leading-tight animate-fade-in">
-              Crea recetas <span className="text-orange-500">únicas</span> con
-              IA
+              Tu Chef Personal con <span className="text-orange-500">IA</span>
             </h1>
             <p className="mt-4 text-lg text-gray-200 animate-fade-in delay-100">
-              Foodia te ayuda a generar recetas personalizadas según tus
-              preferencias y los ingredientes que tienes en casa.
+              Transforma los ingredientes de tu cocina en deliciosas recetas
+              personalizadas. Foodia aprende tus preferencias y te ayuda a crear
+              platos únicos.
             </p>
-            <button className="mt-6 px-6 py-3 bg-orange-500 text-white rounded-md text-lg font-semibold shadow-lg hover:bg-orange-600 transition animate-fade-in delay-200">
-              Descubre más
-            </button>
+            <div className="mt-6 flex flex-wrap gap-4 animate-fade-in delay-200">
+              <button
+                onClick={() =>
+                  document
+                    .getElementById("auth-section")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+                className="px-6 py-3 bg-orange-500 text-white rounded-md text-lg font-semibold shadow-lg hover:bg-orange-600 transition"
+              >
+                Empieza Gratis
+              </button>
+              <button
+                onClick={() =>
+                  document
+                    .getElementById("features")
+                    ?.scrollIntoView({ behavior: "smooth" })
+                }
+                className="px-6 py-3 bg-white/10 backdrop-blur-sm text-white rounded-md text-lg font-semibold shadow-lg hover:bg-white/20 transition border border-white/30"
+              >
+                Cómo Funciona
+              </button>
+            </div>
           </div>
 
           {/* Formulario de login/registro con fondo diferente */}
@@ -80,6 +100,9 @@ export default function Landing() {
           </div>
         </div>
       </section>
+
+      {/* Sección de Estadísticas */}
+      <StatsSection />
 
       {/* Sección informativa */}
       <FeatureSection />
