@@ -6,7 +6,6 @@ interface StepFourProps {
   setPurpose: React.Dispatch<React.SetStateAction<string>>;
   extraDetails: string;
   setExtraDetails: React.Dispatch<React.SetStateAction<string>>;
-  // Para resumen
   selectedCuisines: string[];
   dietRestrictions: string[];
   extraAllergens: string;
@@ -17,6 +16,17 @@ interface StepFourProps {
   cost: string;
   servings: number;
 }
+
+const purposes: string[] = [
+  "Comida diaria",
+  "Ocasión especial",
+  "Cena romántica",
+  "Reunión familiar",
+  "Fiesta",
+  "Saludable",
+  "Deportiva",
+  "Batch cooking",
+];
 
 export default function StepFour({
   purpose,
@@ -33,134 +43,191 @@ export default function StepFour({
   cost,
   servings,
 }: StepFourProps) {
-  // Funciones de mapeo para mostrar valores en español
-  const mapTime = (val: string) => {
-    const timeMap: { [key: string]: string } = {
-      quick: "Rápido (15-30 min)",
-      medium: "Medio (30-60 min)",
-      long: "Largo (más de 60 min)",
-    };
-    return timeMap[val] || val;
-  };
-
-  const mapDifficulty = (val: string) => {
-    const difficultyMap: { [key: string]: string } = {
-      basic: "Básico",
-      intermediate: "Intermedio",
-      advanced: "Avanzado",
-    };
-    return difficultyMap[val] || val;
-  };
-
-  const mapCost = (val: string) => {
-    const costMap: { [key: string]: string } = {
-      low: "Económico",
-      medium: "Moderado",
-      high: "Premium",
-    };
-    return costMap[val] || val;
-  };
-
   return (
-    <div className="space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">Resumen y detalles finales</h1>
-        <p className="text-gray-600">
-          Revisa tus selecciones y agrega cualquier detalle adicional.
+    <div className="space-y-6">
+      <div>
+        <h2 className="text-lg sm:text-xl font-semibold mb-2">
+          Propósito de la receta
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4">
+          ¿Para qué ocasión es esta receta?
         </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
+          {purposes.map((p: string) => (
+            <button
+              key={p}
+              onClick={() => setPurpose(p)}
+              className={`
+                p-2 sm:p-3
+                rounded-lg
+                border
+                text-sm sm:text-base
+                transition-all
+                duration-200
+                ${
+                  purpose === p
+                    ? "border-orange-500 bg-orange-50 text-orange-700"
+                    : "border-gray-200 hover:border-gray-300 text-gray-700"
+                }
+              `}
+            >
+              {p}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* Propósito */}
-      <div className="space-y-2">
-        <h2 className="font-semibold">¿Para qué ocasión es esta receta? (opcional)</h2>
-        <p className="text-sm text-gray-500 mb-2">Puedes generar la receta sin especificar una ocasión</p>
-        <input
-          type="text"
-          value={purpose}
-          onChange={(e) => setPurpose(e.target.value)}
-          placeholder="ej: Cena romántica, Almuerzo familiar, Comida saludable..."
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-        />
-      </div>
-
-      {/* Detalles extra */}
-      <div className="space-y-2">
-        <h2 className="font-semibold">Detalles adicionales (opcional)</h2>
+      <div>
+        <h2 className="text-lg sm:text-xl font-semibold mb-2">
+          Detalles adicionales
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4">
+          ¿Hay algo más que quieras mencionar?
+        </p>
         <textarea
           value={extraDetails}
           onChange={(e) => setExtraDetails(e.target.value)}
-          placeholder="¿Hay algo más que deberíamos saber? Por ejemplo: preferencias de sabor, técnicas específicas..."
-          className="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[100px]"
+          placeholder="Ej: Me gustaría que la receta sea saludable y fácil de preparar"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[100px]"
         />
       </div>
 
-      {/* Resumen de selecciones */}
-      <div className="bg-gray-50 p-4 rounded-lg space-y-3">
-        <h2 className="font-semibold text-lg mb-4">
-          Resumen de tus preferencias
+      <div className="border-t border-gray-200 pt-6">
+        <h2 className="text-lg sm:text-xl font-semibold mb-4">
+          Resumen de preferencias
         </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-2">
+        <div className="space-y-4">
+          {selectedCuisines.length > 0 && (
             <div>
-              <h3 className="font-medium text-gray-700">Tipo de cocina</h3>
-              <p className="text-gray-600">
-                {selectedCuisines.join(", ") || "No seleccionado"}
-              </p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700">
-                Restricciones dietéticas
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                Tipos de cocina:
               </h3>
-              <p className="text-gray-600">
-                {dietRestrictions.join(", ") || "Ninguna"}
-              </p>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {selectedCuisines.map((cuisine) => (
+                  <span
+                    key={cuisine}
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm bg-orange-100 text-orange-800"
+                  >
+                    {cuisine}
+                  </span>
+                ))}
+              </div>
             </div>
+          )}
 
+          {dietRestrictions.length > 0 && (
             <div>
-              <h3 className="font-medium text-gray-700">Alergias</h3>
-              <p className="text-gray-600">{extraAllergens || "Ninguna"}</p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700">
-                Ingredientes a incluir
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                Restricciones dietéticas:
               </h3>
-              <p className="text-gray-600">
-                {ingredientsToInclude.join(", ") || "Ninguno"}
-              </p>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {dietRestrictions.map((diet) => (
+                  <span
+                    key={diet}
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm bg-green-100 text-green-800"
+                  >
+                    {diet}
+                  </span>
+                ))}
+              </div>
             </div>
-          </div>
+          )}
 
-          <div className="space-y-2">
+          {ingredientsToInclude.length > 0 && (
             <div>
-              <h3 className="font-medium text-gray-700">
-                Ingredientes a excluir
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                Ingredientes a incluir:
               </h3>
-              <p className="text-gray-600">
-                {ingredientsToExclude.join(", ") || "Ninguno"}
+              <div className="mt-1 flex flex-wrap gap-2">
+                {ingredientsToInclude.map((ingredient) => (
+                  <span
+                    key={ingredient}
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800"
+                  >
+                    {ingredient}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {ingredientsToExclude.length > 0 && (
+            <div>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                Ingredientes a evitar:
+              </h3>
+              <div className="mt-1 flex flex-wrap gap-2">
+                {ingredientsToExclude.map((ingredient) => (
+                  <span
+                    key={ingredient}
+                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm bg-red-100 text-red-800"
+                  >
+                    {ingredient}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {extraAllergens && (
+            <div>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                Alergias adicionales:
+              </h3>
+              <p className="mt-1 text-sm sm:text-base text-gray-600">
+                {extraAllergens}
+              </p>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                Tiempo:
+              </h3>
+              <p className="mt-1 text-sm sm:text-base text-gray-600">
+                {time === "quick"
+                  ? "Rápido"
+                  : time === "medium"
+                    ? "Medio"
+                    : "Largo"}
               </p>
             </div>
 
             <div>
-              <h3 className="font-medium text-gray-700">Tiempo</h3>
-              <p className="text-gray-600">{mapTime(time)}</p>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                Dificultad:
+              </h3>
+              <p className="mt-1 text-sm sm:text-base text-gray-600">
+                {difficulty === "basic"
+                  ? "Básico"
+                  : difficulty === "intermediate"
+                    ? "Intermedio"
+                    : "Avanzado"}
+              </p>
             </div>
 
             <div>
-              <h3 className="font-medium text-gray-700">Dificultad</h3>
-              <p className="text-gray-600">{mapDifficulty(difficulty)}</p>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                Coste:
+              </h3>
+              <p className="mt-1 text-sm sm:text-base text-gray-600">
+                {cost === "low"
+                  ? "Económico"
+                  : cost === "medium"
+                    ? "Moderado"
+                    : "Premium"}
+              </p>
             </div>
 
             <div>
-              <h3 className="font-medium text-gray-700">Costo</h3>
-              <p className="text-gray-600">{mapCost(cost)}</p>
-            </div>
-
-            <div>
-              <h3 className="font-medium text-gray-700">Porciones</h3>
-              <p className="text-gray-600">{servings}</p>
+              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+                Porciones:
+              </h3>
+              <p className="mt-1 text-sm sm:text-base text-gray-600">
+                {servings}
+              </p>
             </div>
           </div>
         </div>

@@ -1,32 +1,37 @@
+interface ProgressNutrientBarProps {
+  label: string;
+  value: number;
+  low: number;
+  high: number;
+}
+
 export default function ProgressNutrientBar({
   label,
   value,
   low,
   high,
-}: {
-  label: string;
-  value: number;
-  low: number;
-  high: number;
-}) {
-  const percentage = Math.min((value / high) * 100, 100);
-
-  const getColor = () => {
-    if (value <= low) return "bg-green-500"; // Bajo (verde)
-    if (value <= high) return "bg-yellow-500"; // Moderado (amarillo)
-    return "bg-red-500"; // Alto (rojo)
-  };
+}: ProgressNutrientBarProps) {
+  // Calcular el porcentaje de progreso
+  const percentage = Math.min(
+    Math.max(((value - low) / (high - low)) * 100, 0),
+    100
+  );
 
   return (
-    <div className="mb-4">
-      <span className="block font-semibold mb-1">
-        {label}: {value}
-      </span>
-      <div className="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+    <div className="space-y-1">
+      <div className="flex justify-between items-center text-sm sm:text-base">
+        <span className="font-medium text-gray-700">{label}</span>
+        <span className="text-gray-500">{value}g</span>
+      </div>
+      <div className="relative h-2 sm:h-2.5 bg-gray-200 rounded-full overflow-hidden">
         <div
-          className={`h-full ${getColor()}`}
+          className="absolute left-0 top-0 h-full bg-orange-500 rounded-full transition-all duration-500"
           style={{ width: `${percentage}%` }}
-        ></div>
+        />
+      </div>
+      <div className="flex justify-between text-xs sm:text-sm text-gray-500">
+        <span>{low}g</span>
+        <span>{high}g</span>
       </div>
     </div>
   );

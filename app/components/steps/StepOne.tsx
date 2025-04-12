@@ -72,28 +72,32 @@ export default function StepOne({
   };
 
   return (
-    <div className="space-y-8">
-      <div className="space-y-2">
-        <h1 className="text-2xl font-bold">¿Qué tipo de cocina te gustaría?</h1>
-        <p className="text-gray-600">
-          Puedes seleccionar los tipos de cocina que prefieras y especificar
-          cualquier restricción dietética.
-        </p>
-      </div>
-
-      {/* Tipos de cocina */}
+    <div className="space-y-6">
       <div>
-        <h2 className="font-semibold mb-4">Tipos de Cocina</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <h2 className="text-lg sm:text-xl font-semibold mb-2">
+          Tipo de cocina
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4">
+          Selecciona los tipos de cocina que te gustaría explorar
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {CUISINE_OPTIONS.map((cuisine) => (
             <button
               key={cuisine}
               onClick={() => toggleCuisine(cuisine)}
-              className={`p-3 rounded-lg text-sm transition-all transform hover:scale-105 ${
-                selectedCuisines.includes(cuisine)
-                  ? "bg-orange-100 text-orange-700 border-2 border-orange-500"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`
+                p-2 sm:p-3 
+                rounded-lg 
+                text-sm sm:text-base
+                border 
+                transition-all 
+                duration-200
+                ${
+                  selectedCuisines.includes(cuisine)
+                    ? "border-orange-500 bg-orange-50 text-orange-700"
+                    : "border-gray-200 hover:border-gray-300 text-gray-700"
+                }
+              `}
             >
               {cuisine}
             </button>
@@ -101,19 +105,31 @@ export default function StepOne({
         </div>
       </div>
 
-      {/* Restricciones dietéticas */}
       <div>
-        <h2 className="font-semibold mb-4">Restricciones Dietéticas</h2>
-        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+        <h2 className="text-lg sm:text-xl font-semibold mb-2">
+          Restricciones dietéticas
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4">
+          Selecciona si tienes alguna restricción dietética
+        </p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 sm:gap-3">
           {DIET_OPTIONS.map((diet) => (
             <button
               key={diet}
               onClick={() => toggleDiet(diet)}
-              className={`p-3 rounded-lg text-sm transition-all transform hover:scale-105 ${
-                dietRestrictions.includes(diet)
-                  ? "bg-green-100 text-green-700 border-2 border-green-500"
-                  : "bg-gray-100 text-gray-700 hover:bg-gray-200"
-              }`}
+              className={`
+                p-2 sm:p-3 
+                rounded-lg 
+                text-sm sm:text-base
+                border 
+                transition-all 
+                duration-200
+                ${
+                  dietRestrictions.includes(diet)
+                    ? "border-orange-500 bg-orange-50 text-orange-700"
+                    : "border-gray-200 hover:border-gray-300 text-gray-700"
+                }
+              `}
             >
               {diet}
             </button>

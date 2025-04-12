@@ -66,32 +66,33 @@ function InnerLayout({
 
   return (
     <div className="relative min-h-screen">
-      <header className="fixed top-0 left-0 right-0 z-50 px-6 py-3 flex items-center justify-between bg-white shadow-md">
-        <div className="flex items-center gap-2">
+      <header className="fixed top-0 left-0 right-0 z-50 px-3 sm:px-6 py-2 sm:py-3 flex items-center justify-between bg-white shadow-md">
+        <div className="flex items-center gap-2 flex-1">
           <Image
             src="/FoodwaiLogo.png"
             alt="Logo de FoodWai"
-            width={50}
-            height={50}
+            width={40}
+            height={40}
+            className="sm:w-[50px] sm:h-[50px]"
           />
-          {/* <h1 className="text-2xl font-bold text-gray-900">FoodWai</h1> */}
           <Image
             src="/Foodwai.png"
             alt="Logo de FoodWai"
-            width={100}
-            height={50}
+            width={80}
+            height={40}
+            className="sm:w-[100px]"
           />
+          <p className="ml-2 text-xs sm:text-sm text-gray-500 hidden md:block">
+            Descubre y crea recetas con inteligencia artificial
+          </p>
         </div>
-        <p className="ml-2 text-sm text-gray-500 hidden sm:block">
-          Descubre y crea recetas con inteligencia artificial
-        </p>
 
         <div className="relative">
           <button
             onClick={() => setDropdownOpen((prev) => !prev)}
             className="p-2 flex items-center space-x-2"
           >
-            <AdjustmentsHorizontalIcon className="w-6 h-6" />
+            <AdjustmentsHorizontalIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
           {dropdownOpen && (
             <div className="absolute top-full right-0 mt-2 z-50">
@@ -101,7 +102,7 @@ function InnerLayout({
                 <div className="max-w-64 min-w-52 bg-white border border-gray-200 rounded shadow-xl">
                   <button
                     onClick={handleLogout}
-                    className="block w-full text-left px-4 py-2 text-gray-700 hover:text-red-500 transition-colors"
+                    className="block w-full text-left px-4 py-2 text-gray-700 hover:text-red-500 transition-colors text-sm sm:text-base"
                   >
                     Cerrar la sesión de {user?.name || user?.email}
                   </button>
@@ -112,7 +113,7 @@ function InnerLayout({
         </div>
       </header>
 
-      <div className="pt-16">{children}</div>
+      <div className="pt-[56px] sm:pt-[64px]">{children}</div>
     </div>
   );
 }
