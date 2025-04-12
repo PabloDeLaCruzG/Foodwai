@@ -4,17 +4,15 @@ import { IRecipe } from "../lib/interfaces";
 import { recipeApi, userApi } from "../lib/data";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import RecipeCard from "../components/RecipeCard";
-import {
-  ChevronDownIcon,
-  SparklesIcon,
-  XMarkIcon,
-  MagnifyingGlassIcon,
-} from "@heroicons/react/24/solid";
+import { SparklesIcon } from "@heroicons/react/24/solid";
 import WizardModal from "../components/WizardModal";
 import { useAuth } from "../context/AuthContext";
 import AsideSection from "../components/AsideSection";
 import Image from "next/image";
 import AdModal from "../components/AdModal";
+import FilterTabs from "../components/filters/FilterTabs";
+import SearchBar from "../components/filters/SearchBar";
+import SortBy from "../components/filters/SortBy";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<IRecipe[]>([]);
@@ -22,8 +20,6 @@ export default function Home() {
   const [error, setError] = useState<string | null>(null);
   const [showWizard, setShowWizard] = useState(false);
   const [showAdModal, setShowAdModal] = useState(false);
-  const [selectedCuisines, setSelectedCuisines] = useState<string[]>([]);
-  const [dietRestrictions, setDietRestrictions] = useState<string[]>([]);
 
   const [dailyGenerationCount, setDailyGenerationCount] = useState<number>(3);
   const [rewardedGenerations, setRewardedGenerations] = useState<number>(0);
@@ -31,10 +27,7 @@ export default function Home() {
   const imageNumber = dailyGenerationCount + rewardedGenerations;
 
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterType, setFilterType] = useState<"all" | "quick" | "favorite">(
-    "all"
-  );
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [filterType, setFilterType] = useState<"all" | "favorite">("all");
   const [sortBy, setSortBy] = useState<"recent" | "time" | "difficulty">(
     "recent"
   );
@@ -130,6 +123,14 @@ export default function Home() {
     }
   };
 
+  const handleFavoriteToggle = (updatedRecipe: IRecipe) => {
+    setRecipes(
+      recipes.map((recipe) =>
+        recipe._id === updatedRecipe._id ? updatedRecipe : recipe
+      )
+    );
+  };
+
   const filteredRecipes = useMemo(() => {
     return recipes.filter((recipe) => {
       const matchesSearch =
@@ -138,14 +139,11 @@ export default function Home() {
 
       if (!matchesSearch) return false;
 
-      switch (filterType) {
-        case "quick":
-          return recipe.cookingTime <= 30;
-        case "favorite":
-          return true; // TODO: Implementar sistema de favoritos
-        default:
-          return true;
+      if (filterType === "favorite") {
+        return recipe.isFavorite;
       }
+
+      return true;
     });
   }, [recipes, searchTerm, filterType]);
 
@@ -185,205 +183,118 @@ export default function Home() {
         <AsideSection onRecipeSave={fetchRecipes} />
       </aside>
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-        <div className="flex flex-col space-y-4 mb-6">
-          <div className="flex items-center justify-between px-2 py-2 border-b border-gray-200">
-            <div className="flex items-center gap-4">
-              <div className="relative">
-                <button
-                  onClick={() =>
-                    setFilterType((current) =>
-                      current === "all" ? "quick" : "all"
-                    )
-                  }
-                  className="flex items-center gap-2 text-gray-800 font-medium px-3 py-1 rounded-md hover:bg-gray-100 transition-colors"
-                >
-                  <span>{filterType === "all" ? "Todas" : "Rápidas"}</span>
-                  <ChevronDownIcon className="w-4 h-4" />
-                </button>
+        <div className="max-w-7xl mx-auto">
+          {/* Barra de filtros */}
+          <div className="mb-6 border-b border-gray-100 pb-4 pt-2">
+            <div className="flex items-center justify-between gap-2 min-w-0">
+              {/* Ordenación - Izquierda */}
+              <div className="shrink-0">
+                <SortBy sortBy={sortBy} setSortBy={setSortBy} />
               </div>
-              <div className="flex gap-2">
-                {["recent", "time", "difficulty"].map((option) => (
-                  <button
-                    key={option}
-                    onClick={() => setSortBy(option as typeof sortBy)}
-                    className={`px-3 py-1 text-sm rounded-full transition-colors ${
-                      sortBy === option
-                        ? "bg-orange-100 text-orange-600"
-                        : "text-gray-600 hover:bg-gray-100"
-                    }`}
-                  >
-                    {option === "recent"
-                      ? "Recientes"
-                      : option === "time"
-                        ? "Tiempo"
-                        : "Dificultad"}
-                  </button>
-                ))}
+
+              {/* Filtros Todas/Favoritas - Centro */}
+              <div className="flex-1 flex justify-center min-w-0">
+                <FilterTabs
+                  filterType={filterType}
+                  setFilterType={setFilterType}
+                />
+              </div>
+
+              {/* Buscador - Derecha */}
+              <div className="shrink-0">
+                <SearchBar
+                  searchTerm={searchTerm}
+                  setSearchTerm={setSearchTerm}
+                />
               </div>
             </div>
+          </div>
 
-            <div className="flex items-center gap-2">
-              <p className="text-gray-600 text-sm">
-                {sortedAndFilteredRecipes.length}{" "}
-                {sortedAndFilteredRecipes.length === 1 ? "receta" : "recetas"}
-              </p>
-              {isSearchOpen ? (
-                <div className="relative search-enter-active">
-                  <input
-                    type="text"
-                    value={searchTerm}
-                    onChange={(e) => setSearchTerm(e.target.value)}
-                    placeholder="Buscar recetas..."
-                    className="w-full px-3 py-1 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-orange-500"
-                    autoFocus
-                  />
-                  <button
-                    onClick={() => {
-                      setIsSearchOpen(false);
-                      setSearchTerm("");
-                    }}
-                    className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  >
-                    <XMarkIcon className="w-5 h-5" />
-                  </button>
+          {/* Grid de recetas */}
+          {isLoading ? (
+            <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+              {[...Array(8)].map((_, i) => (
+                <div key={i} className="animate-pulse">
+                  <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
+                  <div className="space-y-3">
+                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
+                    <div className="h-4 bg-gray-200 rounded"></div>
+                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+                  </div>
                 </div>
-              ) : (
+              ))}
+            </div>
+          ) : error ? (
+            <div className="flex flex-col items-center justify-center min-h-[400px] px-4 gap-4">
+              <h2 className="text-xl sm:text-2xl font-semibold text-center">
+                Error
+              </h2>
+              <p className="text-gray-600 text-center max-w-md text-sm sm:text-base">
+                {error}
+              </p>
+              <button
+                onClick={fetchRecipes}
+                className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors"
+              >
+                Reintentar
+              </button>
+            </div>
+          ) : sortedAndFilteredRecipes.length === 0 ? (
+            <div className="flex flex-col items-center justify-center min-h-[400px] px-4 gap-4">
+              <h2 className="text-xl sm:text-2xl font-semibold text-center">
+                {searchTerm
+                  ? "No se encontraron recetas"
+                  : filterType === "favorite"
+                    ? "No tienes recetas favoritas"
+                    : "Aún no tienes recetas creadas"}
+              </h2>
+              <p className="text-gray-600 text-center max-w-md text-sm sm:text-base">
+                {searchTerm
+                  ? `No hay resultados para "${searchTerm}". Intenta con otra búsqueda.`
+                  : filterType === "favorite"
+                    ? "Marca algunas recetas como favoritas para verlas aquí"
+                    : "¿Sin ideas? Genera tu primera receta con IA y descubre nuevas creaciones culinarias."}
+              </p>
+              {!searchTerm && filterType !== "favorite" && (
                 <button
-                  onClick={() => setIsSearchOpen(true)}
-                  className="flex items-center gap-2 text-gray-600 px-3 py-1 rounded-md hover:bg-gray-100 transition-colors"
+                  onClick={handleFloatingButtonClick}
+                  className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors"
                 >
-                  <MagnifyingGlassIcon className="w-5 h-5" />
+                  <SparklesIcon className="w-5 h-5" />
+                  Crear nueva receta
                 </button>
               )}
             </div>
-          </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-4">
+              {sortedAndFilteredRecipes.map((recipe) => (
+                <RecipeCard
+                  key={recipe._id}
+                  recipe={recipe}
+                  onFavoriteToggle={handleFavoriteToggle}
+                />
+              ))}
+            </div>
+          )}
 
-          {/* Tags/Filters */}
-          <div className="flex flex-wrap gap-2 px-2">
-            {selectedCuisines.length > 0 &&
-              selectedCuisines.map((cuisine) => (
-                <span
-                  key={cuisine}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-orange-100 text-orange-700 rounded-full text-sm"
-                >
-                  {cuisine}
-                  <button
-                    onClick={() =>
-                      setSelectedCuisines((prev) =>
-                        prev.filter((c) => c !== cuisine)
-                      )
-                    }
-                  >
-                    <XMarkIcon className="w-4 h-4" />
-                  </button>
-                </span>
-              ))}
-            {dietRestrictions.length > 0 &&
-              dietRestrictions.map((diet) => (
-                <span
-                  key={diet}
-                  className="inline-flex items-center gap-1 px-2 py-1 bg-green-100 text-green-700 rounded-full text-sm"
-                >
-                  {diet}
-                  <button
-                    onClick={() =>
-                      setDietRestrictions((prev) =>
-                        prev.filter((d) => d !== diet)
-                      )
-                    }
-                  >
-                    <XMarkIcon className="w-4 h-4" />
-                  </button>
-                </span>
-              ))}
-            {searchTerm && (
-              <span className="inline-flex items-center gap-1 px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-sm">
-                Búsqueda: {searchTerm}
-                <button onClick={() => setSearchTerm("")}>
-                  <XMarkIcon className="w-4 h-4" />
-                </button>
-              </span>
-            )}
-          </div>
+          {/* Botón flotante */}
+          <button
+            className="fixed bottom-8 right-6 bg-orange-500 text-white p-4 rounded-full shadow-lg hover:bg-orange-600 transition-colors"
+            onClick={handleFloatingButtonClick}
+          >
+            <Image
+              src={`/${imageNumber}off.webp`}
+              alt="Wizard"
+              width={40}
+              height={40}
+            />
+          </button>
+
+          {showWizard && <WizardModal onClose={closeWizard} />}
+          {showAdModal && (
+            <AdModal onClose={closeAdModal} onWatchAd={handleWatchAd} />
+          )}
         </div>
-
-        {/* Grid de recetas */}
-        {isLoading ? (
-          <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
-            {[...Array(8)].map((_, i) => (
-              <div key={i} className="animate-pulse">
-                <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
-                <div className="space-y-3">
-                  <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                  <div className="h-4 bg-gray-200 rounded"></div>
-                  <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ) : error ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px] px-4 gap-4">
-            <h2 className="text-xl sm:text-2xl font-semibold text-center">
-              Error
-            </h2>
-            <p className="text-gray-600 text-center max-w-md text-sm sm:text-base">
-              {error}
-            </p>
-            <button
-              onClick={fetchRecipes}
-              className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors"
-            >
-              Reintentar
-            </button>
-          </div>
-        ) : sortedAndFilteredRecipes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center min-h-[400px] px-4 gap-4">
-            <h2 className="text-xl sm:text-2xl font-semibold text-center">
-              {searchTerm
-                ? "No se encontraron recetas"
-                : "Aún no tienes recetas creadas"}
-            </h2>
-            <p className="text-gray-600 text-center max-w-md text-sm sm:text-base">
-              {searchTerm
-                ? `No hay resultados para "${searchTerm}". Intenta con otra búsqueda.`
-                : "¿Sin ideas? Genera tu primera receta con IA y descubre nuevas creaciones culinarias."}
-            </p>
-            {!searchTerm && (
-              <button
-                onClick={handleFloatingButtonClick}
-                className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors"
-              >
-                <SparklesIcon className="w-5 h-5" />
-                Crear nueva receta
-              </button>
-            )}
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {sortedAndFilteredRecipes.map((recipe) => (
-              <RecipeCard key={recipe._id} recipe={recipe} />
-            ))}
-          </div>
-        )}
-
-        {/* Botón flotante para abrir el Wizard */}
-        <button
-          className="fixed bottom-8 right-6 bg-orange-500 text-white p-4 rounded-full shadow-lg hover:bg-orange-600 transition-colors"
-          onClick={handleFloatingButtonClick}
-        >
-          <Image
-            src={`/${imageNumber}off.webp`}
-            alt="Wizard"
-            width={40}
-            height={40}
-          />
-        </button>
-
-        {showWizard && <WizardModal onClose={closeWizard} />}
-
-        {showAdModal && (
-          <AdModal onClose={closeAdModal} onWatchAd={handleWatchAd} />
-        )}
       </div>
     </main>
   );

@@ -5,7 +5,7 @@ import config from "./config";
 // Configurar axios para usar la URL base según el entorno
 const api = axios.create({
   baseURL: config.apiUrl,
-  withCredentials: true
+  withCredentials: true,
 });
 
 export const recipeApi = {
@@ -26,7 +26,7 @@ export const recipeApi = {
   getRecipesByAuthor: async (authorId: string): Promise<IRecipe[]> => {
     try {
       const response = await api.get("/api/recipes/author", {
-        params: { authorId }
+        params: { authorId },
       });
       return response.data;
     } catch (error) {
@@ -85,8 +85,8 @@ export const recipeApi = {
     try {
       const response = await api.post("/api/recipes/generate", recipeParams, {
         headers: {
-          "Content-Type": "application/json"
-        }
+          "Content-Type": "application/json",
+        },
       });
       return response.data;
     } catch (error) {
@@ -97,17 +97,33 @@ export const recipeApi = {
 
   generateImageForRecipe: async (recipeId: string) => {
     try {
-      const response = await api.post("/api/recipes/generateImage", 
+      const response = await api.post(
+        "/api/recipes/generateImage",
         { recipeId },
         {
           headers: {
-            "Content-Type": "application/json"
-          }
+            "Content-Type": "application/json",
+          },
         }
       );
       return response.data;
     } catch (error) {
       console.error("Error al generar la imagen de la receta:", error);
+      throw error;
+    }
+  },
+
+  /**
+   * Marca o desmarca una receta como favorita
+   * @param id ID de la receta
+   * @param isFavorite nuevo estado de favorito
+   */
+  toggleFavorite: async (id: string, isFavorite: boolean): Promise<IRecipe> => {
+    try {
+      const response = await api.put(`/api/recipes/${id}`, { isFavorite });
+      return response.data;
+    } catch (error) {
+      console.error("Error al actualizar favorito:", error);
       throw error;
     }
   },
