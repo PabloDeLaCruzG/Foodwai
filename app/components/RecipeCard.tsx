@@ -5,12 +5,15 @@ import Link from "next/link";
 import { IRecipe } from "../lib/interfaces";
 import axios from "axios";
 import config from "../lib/config";
-import { ClockIcon } from "@heroicons/react/24/solid";
+import { ClockIcon, StarIcon } from "@heroicons/react/24/solid";
+import { recipeApi } from "../lib/data";
 
 export default function RecipeCard({
   recipe: initialRecipe,
+  onFavoriteToggle,
 }: {
   recipe: IRecipe;
+  onFavoriteToggle?: (recipe: IRecipe) => void;
 }) {
   const [recipe, setRecipe] = useState<IRecipe>(initialRecipe);
 
@@ -40,6 +43,22 @@ export default function RecipeCard({
 
     return () => clearInterval(intervalId);
   }, [initialRecipe]);
+
+  const handleFavoriteClick = async (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevenir la navegación del Link
+    try {
+      const updatedRecipe = await recipeApi.toggleFavorite(
+        recipe._id!,
+        !recipe.isFavorite
+      );
+      setRecipe(updatedRecipe);
+      if (onFavoriteToggle) {
+        onFavoriteToggle(updatedRecipe);
+      }
+    } catch (error) {
+      console.error("Error al actualizar favorito:", error);
+    }
+  };
 
   return (
     <Link href={`/home/${recipe._id}`} className="block">
@@ -84,8 +103,19 @@ export default function RecipeCard({
             </div>
           )}
 
+          <button
+            onClick={handleFavoriteClick}
+            className="absolute top-2 right-2 p-2 rounded-full bg-white/80 backdrop-blur-sm hover:bg-white transition-colors"
+          >
+            <StarIcon
+              className={`w-6 h-6 ${
+                recipe.isFavorite ? "text-yellow-400" : "text-gray-400"
+              }`}
+            />
+          </button>
+
           {recipe.difficulty && (
-            <span className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm text-xs sm:text-sm px-2 py-1 rounded-full">
+            <span className="absolute top-2 left-2 bg-white/80 backdrop-blur-sm text-xs sm:text-sm px-2 py-1 rounded-full">
               {recipe.difficulty === "basic"
                 ? "Básico"
                 : recipe.difficulty === "intermediate"

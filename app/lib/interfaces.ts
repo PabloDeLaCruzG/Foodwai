@@ -29,6 +29,7 @@ export interface IRecipe {
   steps: Step[];
   imageUrl?: string;
   authorId?: string;
+  isFavorite?: boolean;
   createdAt?: string;
   updatedAt?: string;
 }

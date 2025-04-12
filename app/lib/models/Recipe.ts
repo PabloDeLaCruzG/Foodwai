@@ -32,6 +32,7 @@ export interface IRecipe extends Document {
   createdAt?: Date;
   updatedAt?: Date;
   imageUrl?: string;
+  isFavorite?: boolean;
 }
 
 const RecipeSchema = new Schema<IRecipe>(
@@ -95,6 +96,10 @@ const RecipeSchema = new Schema<IRecipe>(
       type: Schema.Types.ObjectId,
       ref: "User",
       required: true,
+    },
+    isFavorite: {
+      type: Boolean,
+      default: false,
     },
   },
   {
