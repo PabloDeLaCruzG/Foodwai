@@ -11,62 +11,84 @@ export default function StepIndicator({
   steps,
 }: StepIndicatorProps) {
   return (
-    <div className="relative px-4">
-      <div className="overflow-hidden">
-        {/* Líneas base y de progreso */}
-        <div className="absolute top-4 left-0 w-full h-0.5 bg-gray-200" />
+    <div className="relative">
+      {/* Línea de progreso */}
+      <div
+        className="absolute top-5 left-0 h-0.5 bg-gray-200"
+        style={{ width: "100%" }}
+      >
         <div
-          className="absolute top-4 left-0 h-0.5 bg-orange-500 transition-all duration-500"
+          className="h-full bg-orange-500 transition-all duration-500"
           style={{
             width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
           }}
         />
+      </div>
 
-        {/* Círculos y etiquetas */}
-        <div className="relative flex justify-between">
-          {steps.map((label, idx) => (
-            <div key={idx} className="relative flex flex-col items-center">
+      {/* Steps */}
+      <div className="relative flex justify-between">
+        {steps.map((step, index) => {
+          const isCompleted = currentStep > index + 1;
+          const isCurrent = currentStep === index + 1;
+
+          return (
+            <div
+              key={step}
+              className={`flex flex-col items-center ${
+                index === steps.length - 1 ? "items-end" : ""
+              }`}
+            >
+              {/* Círculo indicador */}
               <div
-                className={`w-8 h-8 rounded-full border-2 flex items-center justify-center transition-all duration-500 ${
-                  idx + 1 === currentStep
-                    ? "border-orange-500 bg-orange-50 text-orange-500"
-                    : idx + 1 < currentStep
-                    ? "border-orange-500 bg-orange-500 text-white"
-                    : "border-gray-300 bg-white text-gray-300"
-                }`}
+                className={`
+                  w-4 h-4 sm:w-5 sm:h-5
+                  rounded-full
+                  border-2
+                  flex
+                  items-center
+                  justify-center
+                  transition-all
+                  duration-500
+                  ${
+                    isCompleted || isCurrent
+                      ? "border-orange-500 bg-orange-500"
+                      : "border-gray-300 bg-white"
+                  }
+                `}
               >
-                {idx + 1 < currentStep ? (
-                  <svg
-                    className="w-5 h-5"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2.5}
-                      d="M5 13l4 4L19 7"
-                    />
-                  </svg>
-                ) : (
-                  <span className="text-sm">{idx + 1}</span>
-                )}
+                <div
+                  className={`
+                    w-2 h-2 sm:w-2.5 sm:h-2.5
+                    rounded-full
+                    ${
+                      isCompleted
+                        ? "bg-white"
+                        : isCurrent
+                          ? "bg-white"
+                          : "bg-transparent"
+                    }
+                  `}
+                />
               </div>
+
+              {/* Label */}
               <span
-                className={`absolute -bottom-6 text-xs transform -translate-x-1/2 whitespace-nowrap transition-all duration-500 ${
-                  idx + 1 === currentStep
-                    ? "text-orange-500 font-medium scale-110"
-                    : idx + 1 < currentStep
-                    ? "text-gray-500"
-                    : "text-gray-400"
-                }`}
+                className={`
+                  mt-2
+                  text-xs sm:text-sm
+                  font-medium
+                  ${
+                    isCompleted || isCurrent
+                      ? "text-orange-500"
+                      : "text-gray-500"
+                  }
+                `}
               >
-                {label}
+                {step}
               </span>
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </div>
   );

@@ -42,14 +42,10 @@ export default function RecipeCard({
   }, [initialRecipe]);
 
   return (
-    <Link href={`/home/${recipe._id}`}>
+    <Link href={`/home/${recipe._id}`} className="block">
       <article
-        className="
-        w-40
-        max-h-50
-        sm:w-60
-        sm:max-h-75
-        rounded-lg
+        className={`
+        rounded-xl 
         overflow-hidden
         shadow-md
         hover:shadow-xl
@@ -60,7 +56,7 @@ export default function RecipeCard({
         bg-white
         opacity-0
         animate-[fadeIn_0.5s_ease-in-out_forwards]
-        "
+        `}
       >
         <div className="relative w-full aspect-square">
           {recipe.imageUrl ? (
@@ -73,7 +69,7 @@ export default function RecipeCard({
           ) : (
             <div className="w-full h-full bg-gray-200 animate-pulse flex items-center justify-center">
               <svg
-                className="w-10 h-10 text-gray-300"
+                className="w-8 h-8 sm:w-10 sm:h-10 text-gray-300"
                 fill="none"
                 stroke="currentColor"
                 viewBox="0 0 24 24"
@@ -81,27 +77,35 @@ export default function RecipeCard({
                 <path
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  strokeWidth="2"
+                  strokeWidth={2}
                   d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"
                 />
               </svg>
             </div>
           )}
+
+          {recipe.difficulty && (
+            <span className="absolute top-2 right-2 bg-white/80 backdrop-blur-sm text-xs sm:text-sm px-2 py-1 rounded-full">
+              {recipe.difficulty === "basic"
+                ? "Básico"
+                : recipe.difficulty === "intermediate"
+                  ? "Intermedio"
+                  : "Avanzado"}
+            </span>
+          )}
         </div>
-        <div className="p-4">
-          <h3 className="font-semibold text-gray-800 mb-1 line-clamp-2">
+
+        <div className="p-3 sm:p-4">
+          <h3 className="font-semibold text-base sm:text-lg text-gray-900 mb-1 line-clamp-2">
             {recipe.title}
           </h3>
-          <p className="text-sm text-gray-600 line-clamp-2">
+          <p className="text-sm sm:text-base text-gray-600 mb-2 line-clamp-2">
             {recipe.description}
           </p>
-          <div className="mt-2 flex items-center gap-2 text-sm text-gray-500">
-            <span className="flex items-center">
-              <ClockIcon className="w-4 h-4 mr-1" />
-              {recipe.cookingTime}min
-            </span>
-            <span className="px-1">•</span>
-            <span>{recipe.difficulty}</span>
+
+          <div className="flex items-center text-xs sm:text-sm text-gray-500">
+            <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-400 mr-1" />
+            <span>{recipe.cookingTime} min</span>
           </div>
         </div>
       </article>

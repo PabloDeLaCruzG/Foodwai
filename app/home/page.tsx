@@ -151,7 +151,7 @@ export default function Home() {
 
   const sortedAndFilteredRecipes = useMemo(() => {
     const sorted = [...filteredRecipes];
-    
+
     switch (sortBy) {
       case "time": {
         sorted.sort((a, b) => a.cookingTime - b.cookingTime);
@@ -159,20 +159,23 @@ export default function Home() {
       }
       case "difficulty": {
         const difficultyOrder = { basic: 0, intermediate: 1, advanced: 2 };
-        sorted.sort((a, b) =>
-          difficultyOrder[a.difficulty as keyof typeof difficultyOrder] -
-          difficultyOrder[b.difficulty as keyof typeof difficultyOrder]
+        sorted.sort(
+          (a, b) =>
+            difficultyOrder[a.difficulty as keyof typeof difficultyOrder] -
+            difficultyOrder[b.difficulty as keyof typeof difficultyOrder]
         );
         break;
       }
       case "recent":
       default: {
-        sorted.sort((a, b) =>
-          new Date(b.createdAt || "").getTime() - new Date(a.createdAt || "").getTime()
+        sorted.sort(
+          (a, b) =>
+            new Date(b.createdAt || "").getTime() -
+            new Date(a.createdAt || "").getTime()
         );
       }
     }
-    
+
     return sorted;
   }, [filteredRecipes, sortBy]);
 
@@ -212,8 +215,8 @@ export default function Home() {
                     {option === "recent"
                       ? "Recientes"
                       : option === "time"
-                      ? "Tiempo"
-                      : "Dificultad"}
+                        ? "Tiempo"
+                        : "Dificultad"}
                   </button>
                 ))}
               </div>
@@ -306,7 +309,7 @@ export default function Home() {
 
         {/* Grid de recetas */}
         {isLoading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
             {[...Array(8)].map((_, i) => (
               <div key={i} className="animate-pulse">
                 <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
@@ -319,9 +322,13 @@ export default function Home() {
             ))}
           </div>
         ) : error ? (
-          <div className="flex flex-col items-center justify-center h-[400px] gap-4">
-            <h2 className="text-2xl font-semibold">Error</h2>
-            <p className="text-gray-600 text-center max-w-md">{error}</p>
+          <div className="flex flex-col items-center justify-center min-h-[400px] px-4 gap-4">
+            <h2 className="text-xl sm:text-2xl font-semibold text-center">
+              Error
+            </h2>
+            <p className="text-gray-600 text-center max-w-md text-sm sm:text-base">
+              {error}
+            </p>
             <button
               onClick={fetchRecipes}
               className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors"
@@ -330,13 +337,13 @@ export default function Home() {
             </button>
           </div>
         ) : sortedAndFilteredRecipes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-[400px] gap-4">
-            <h2 className="text-2xl font-semibold">
+          <div className="flex flex-col items-center justify-center min-h-[400px] px-4 gap-4">
+            <h2 className="text-xl sm:text-2xl font-semibold text-center">
               {searchTerm
                 ? "No se encontraron recetas"
                 : "Aún no tienes recetas creadas"}
             </h2>
-            <p className="text-gray-600 text-center max-w-md">
+            <p className="text-gray-600 text-center max-w-md text-sm sm:text-base">
               {searchTerm
                 ? `No hay resultados para "${searchTerm}". Intenta con otra búsqueda.`
                 : "¿Sin ideas? Genera tu primera receta con IA y descubre nuevas creaciones culinarias."}
@@ -352,7 +359,7 @@ export default function Home() {
             )}
           </div>
         ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {sortedAndFilteredRecipes.map((recipe) => (
               <RecipeCard key={recipe._id} recipe={recipe} />
             ))}

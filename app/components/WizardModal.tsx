@@ -193,37 +193,37 @@ export default function WizardModal({ onClose }: WizardModalProps) {
   const stepLabels = ["Cocina y dieta", "Ingredientes", "Detalles", "Resumen"];
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30 p-4 text-gray-900 animate-fadeIn">
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-30 p-2 sm:p-4 text-gray-900 animate-fadeIn">
       <div className="bg-white w-full max-w-3xl rounded-xl shadow-xl relative overflow-hidden animate-slideUp">
         {/* Contenedor scrollable */}
         <div
           ref={scrollableRef}
-          className="max-h-[90vh] overflow-y-auto px-6 py-8 custom-scrollbar"
+          className="max-h-[90vh] overflow-y-auto px-3 sm:px-6 py-4 sm:py-8 custom-scrollbar"
         >
           {/* Botón de cierre */}
           <button
-            className="absolute top-4 right-4 text-gray-500 hover:text-gray-700 transition-colors"
+            className="absolute top-2 right-2 sm:top-4 sm:right-4 text-gray-500 hover:text-gray-700 transition-colors"
             onClick={onClose}
             disabled={isLoading} // Evita cerrar si se está cargando
             title="Cerrar wizard"
           >
-            <XMarkIcon className="w-6 h-6" />
+            <XMarkIcon className="w-5 h-5 sm:w-6 sm:h-6" />
           </button>
 
           {/* Timeline / StepIndicator */}
           <StepIndicator currentStep={currentStep} steps={stepLabels} />
 
           {/* Contenido del wizard */}
-          <div className="mt-8 transition-opacity duration-300 ease-in-out">
+          <div className="mt-6 sm:mt-8 transition-opacity duration-300 ease-in-out">
             {renderStep()}
           </div>
 
           {/* Footer de navegación */}
-          <div className="mt-8 flex justify-between pb-4">
+          <div className="mt-6 sm:mt-8 flex justify-between pb-4">
             {canGoBack ? (
               <button
                 onClick={goBack}
-                className="px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-2"
+                className="px-3 sm:px-4 py-2 rounded-md border border-gray-300 text-gray-700 hover:bg-gray-100 transition-colors flex items-center gap-1 sm:gap-2 text-sm sm:text-base"
                 disabled={isLoading}
               >
                 <ChevronLeftIcon className="w-4 h-4" />
@@ -236,7 +236,7 @@ export default function WizardModal({ onClose }: WizardModalProps) {
             {canGoNext ? (
               <button
                 onClick={goNext}
-                className={`px-4 py-2 rounded-md transition-all transform hover:scale-105 flex items-center gap-2 ${
+                className={`px-3 sm:px-4 py-2 rounded-md transition-all transform hover:scale-105 flex items-center gap-1 sm:gap-2 text-sm sm:text-base ${
                   isStepValid()
                     ? "bg-orange-500 text-white hover:bg-orange-600"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -254,7 +254,7 @@ export default function WizardModal({ onClose }: WizardModalProps) {
             ) : (
               <button
                 onClick={handleGenerateRecipe}
-                className={`px-4 py-2 rounded-md transition-all transform hover:scale-105 flex items-center gap-2 ${
+                className={`px-3 sm:px-4 py-2 rounded-md transition-all transform hover:scale-105 flex items-center gap-1 sm:gap-2 text-sm sm:text-base ${
                   isStepValid()
                     ? "bg-orange-500 text-white hover:bg-orange-600"
                     : "bg-gray-300 text-gray-500 cursor-not-allowed"
@@ -264,12 +264,12 @@ export default function WizardModal({ onClose }: WizardModalProps) {
                 {isLoading ? (
                   <>
                     <span>Generando</span>
-                    <SparklesIcon className="w-5 h-5 animate-pulse" />
+                    <SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5 animate-pulse" />
                   </>
                 ) : (
                   <>
                     <span>Generar Receta</span>
-                    <SparklesIcon className="w-5 h-5" />
+                    <SparklesIcon className="w-4 h-4 sm:w-5 sm:h-5" />
                   </>
                 )}
               </button>

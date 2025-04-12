@@ -58,7 +58,6 @@ export default function RecipeDetailsPage() {
         fetchRecipe();
       }, 10000); // Polling cada 10 segundos
     }
-    
   }, [id]);
 
   if (!recipe) {
@@ -70,29 +69,29 @@ export default function RecipeDetailsPage() {
   }
 
   return (
-    <div className="xl:w-4/5 mx-auto px-4 py-8 text-gray-800">
+    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 text-gray-800">
       {/* Botón Volver */}
-      <div className="flex items-center mb-6">
+      <div className="flex items-center mb-4 sm:mb-6">
         <Link
           href="/home"
           className="inline-flex items-center text-gray-700 hover:text-gray-900"
         >
-          <ArrowLongLeftIcon className="w-5 h-5 mr-1" />
-          <span className="text-sm font-medium">Volver</span>
+          <ArrowLongLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
+          <span className="text-sm sm:text-base font-medium">Volver</span>
         </Link>
       </div>
 
       {/* Encabezado / Imagen principal */}
-      <header className="relative w-full h-64 mb-6">
+      <header className="relative w-full h-48 sm:h-64 mb-4 sm:mb-6">
         {recipe.imageUrl ? (
           <img
             src={recipe.imageUrl}
             alt={recipe.title}
-            className="object-cover rounded-xl shadow-md w-full h-full opacity-0 transition-opacity duration-700"
+            className="w-full h-full object-cover rounded-lg sm:rounded-xl shadow-md opacity-0 transition-opacity duration-700"
             onLoad={(e) => e.currentTarget.classList.add("opacity-100")}
           />
         ) : (
-          <div className="w-full h-full bg-gray-200 rounded-xl animate-pulse" />
+          <div className="w-full h-full bg-gray-200 rounded-lg sm:rounded-xl animate-pulse" />
         )}
         {!recipe.imageUrl && (
           <span className="absolute top-2 left-2 bg-yellow-400 text-white text-xs px-2 py-1 rounded shadow">
@@ -102,51 +101,61 @@ export default function RecipeDetailsPage() {
       </header>
 
       {/* Título y descripción */}
-      <div className="mb-8">
-        <h1 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-2">
+      <div className="mb-6 sm:mb-8">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
           {recipe.title}
         </h1>
-        <p className="text-base text-gray-600">{recipe.description}</p>
+        <p className="text-sm sm:text-base text-gray-600">
+          {recipe.description}
+        </p>
       </div>
 
       <main>
         {/* GRID con Info General + Info Nutricional */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-y-6 sm:gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
           {/* Sección Info General */}
-          <section className="col-span-2 bg-white p-4 rounded-xl shadow-md">
+          <section className="col-span-1 md:col-span-2 bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl shadow-md">
             <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-3">
               <div className="flex items-center gap-2 text-gray-600">
-                <ClockIcon className="w-5 h-5 text-orange-300" />
-                <span className="font-semibold">Tiempo</span>
+                <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-300" />
+                <span className="font-semibold text-sm sm:text-base">
+                  Tiempo
+                </span>
               </div>
-              <p>{recipe.cookingTime} min</p>
+              <p className="text-sm sm:text-base">{recipe.cookingTime} min</p>
             </div>
 
             <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-3">
               <div className="flex items-center gap-2 text-gray-600">
-                <span className="font-semibold">Dificultad</span>
+                <span className="font-semibold text-sm sm:text-base">
+                  Dificultad
+                </span>
               </div>
-              <p>{recipe.difficulty}</p>
+              <p className="text-sm sm:text-base">{recipe.difficulty}</p>
             </div>
 
             <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-3">
               <div className="flex items-center gap-2 text-gray-600">
-                <BanknotesIcon className="w-5 h-5 text-orange-300" />
-                <span className="font-semibold">Coste</span>
+                <BanknotesIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-300" />
+                <span className="font-semibold text-sm sm:text-base">
+                  Coste
+                </span>
               </div>
-              <p>{recipe.costLevel}</p>
+              <p className="text-sm sm:text-base">{recipe.costLevel}</p>
             </div>
 
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2 text-gray-600">
-                <span className="font-semibold">Cocina</span>
+                <span className="font-semibold text-sm sm:text-base">
+                  Cocina
+                </span>
               </div>
-              <p>{recipe.cuisine}</p>
+              <p className="text-sm sm:text-base">{recipe.cuisine}</p>
             </div>
           </section>
           {/* Sección Información Nutricional */}
-          <aside className="bg-white p-4 rounded-xl shadow-md">
-            <h2 className="text-lg font-semibold mb-4">
+          <aside className="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl shadow-md">
+            <h2 className="text-lg sm:text-xl font-semibold mb-4">
               Información Nutricional
             </h2>
 
@@ -207,11 +216,11 @@ export default function RecipeDetailsPage() {
         </div>
 
         {/* Sección de Ingredientes - estilo “tarjetado” en grid */}
-        <section className="bg-white p-4 mt-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900">
+        <section className="bg-white p-3 sm:p-4 mt-4 sm:mt-6 rounded-lg sm:rounded-xl shadow-md">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-900">
             Ingredientes
           </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
             {recipe.ingredients.map((item, index) => (
               <div
                 key={index}
@@ -227,21 +236,23 @@ export default function RecipeDetailsPage() {
         </section>
 
         {/* Sección de Pasos - estilo “timeline” */}
-        <section className="bg-white p-4 mt-6 rounded-xl shadow-md">
-          <h2 className="text-xl font-semibold mb-4 text-gray-900">
+        <section className="bg-white p-3 sm:p-4 mt-4 sm:mt-6 rounded-lg sm:rounded-xl shadow-md">
+          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-900">
             Preparación
           </h2>
 
           {/* Contenedor con una línea a la izquierda simulando un timeline */}
-          <div className="relative border-l-4 border-orange-300 pl-6">
+          <div className="relative border-l-4 border-orange-300 pl-4 sm:pl-6">
             {recipe.steps.map((step, index) => (
               <div key={index} className="mb-6 relative">
                 {/* Pequeño círculo para cada paso */}
-                <div className="w-4 h-4 bg-orange-300 rounded-full absolute -left-2 top-1" />
-                <h3 className="font-semibold mb-1 ml-4">
+                <div className="w-3 h-3 sm:w-4 sm:h-4 bg-orange-300 rounded-full absolute -left-2 sm:-left-2.5 top-1" />
+                <h3 className="font-semibold mb-1 ml-2 sm:ml-4 text-sm sm:text-base">
                   Paso {step.stepNumber}
                 </h3>
-                <p className="text-gray-700">{step.description}</p>
+                <p className="text-gray-700 text-sm sm:text-base">
+                  {step.description}
+                </p>
               </div>
             ))}
           </div>
