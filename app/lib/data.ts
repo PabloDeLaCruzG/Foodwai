@@ -1,11 +1,21 @@
 import axios from "axios";
 import { GenerateRecipeBody, IRecipe, IUser } from "./interfaces";
 import config from "./config";
+import { getCookie } from "./utils/authUtils";
 
 // Configurar axios para usar la URL base según el entorno
 const api = axios.create({
   baseURL: config.apiUrl,
   withCredentials: true,
+});
+
+// Añadir interceptor para incluir el token en todas las peticiones
+api.interceptors.request.use((config) => {
+  const token = getCookie("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const recipeApi = {
@@ -95,20 +105,56 @@ export const recipeApi = {
     }
   },
 
-  generateImageForRecipe: async (recipeId: string) => {
+  async generateImageForRecipe(recipeId: string) {
     try {
-      const response = await api.post(
-        "/api/recipes/generateImage",
-        { recipeId },
+      // Intentamos obtener el token
+      const token = getCookie("token");
+
+      // Si no hay token en las cookies, intentamos obtenerlo de localStorage como respaldo
+      const localToken =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+      if (!token && !localToken) {
+        throw new Error(
+          "No has iniciado sesión. Por favor, inicia sesión para continuar."
+        );
+      }
+
+      // Intentamos obtener la receta primero
+      const recipe = await this.getRecipeById(recipeId);
+
+      // Si ya hay un error previo, confirmamos antes de reintentar
+      if (recipe.imageStatus === "error") {
+        if (
+          !confirm(
+            "Hubo un error previo al generar la imagen. ¿Desea intentar nuevamente?"
+          )
+        ) {
+          return;
+        }
+      }
+
+      const response = await fetch(
+        `${config.apiUrl}/api/recipes/generate-image-now`,
         {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token || localToken}`,
           },
+          credentials: "include",
+          body: JSON.stringify({ recipeId }),
         }
       );
-      return response.data;
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al generar la imagen");
+      }
+
+      return response.json();
     } catch (error) {
-      console.error("Error al generar la imagen de la receta:", error);
+      console.error("Error en generateImageForRecipe:", error);
       throw error;
     }
   },

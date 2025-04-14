@@ -43,22 +43,60 @@ export default function RecipeDetailsPage() {
         const data = await recipeApi.getRecipeById(id!);
         setRecipe(data);
 
-        if (data.imageUrl && intervalId) {
-          clearInterval(intervalId!);
+        // Detener el polling si:
+        // 1. La imagen está lista
+        // 2. Hay un error en la generación
+        // 3. El estado es 'completed'
+        if (
+          data.imageUrl ||
+          data.imageStatus === "error" ||
+          data.imageStatus === "completed"
+        ) {
+          clearInterval(intervalId);
         }
       } catch (error: unknown) {
         console.error("Error fetching recipe:", error as Error);
+        clearInterval(intervalId); // También detenemos el polling si hay un error en la petición
       }
     };
 
     if (id) {
       fetchRecipe();
 
-      intervalId = setInterval(() => {
-        fetchRecipe();
-      }, 10000); // Polling cada 10 segundos
+      // Iniciar polling solo si no hay imagen y no hay error
+      if (!recipe?.imageUrl && recipe?.imageStatus !== "error") {
+        intervalId = setInterval(() => {
+          fetchRecipe();
+        }, 10000); // Polling cada 10 segundos
+      }
     }
-  }, [id]);
+
+    return () => {
+      if (intervalId) {
+        clearInterval(intervalId);
+      }
+    };
+  }, [id, recipe?.imageUrl, recipe?.imageStatus]);
+
+  const handleRetryGenerateImage = async () => {
+    if (!recipe?._id) return;
+
+    try {
+      await recipeApi.generateImageForRecipe(recipe._id);
+      // Reiniciar el polling
+      setRecipe((prev) =>
+        prev
+          ? {
+              ...prev,
+              imageStatus: "pending",
+              imageError: undefined,
+            }
+          : null
+      );
+    } catch (error) {
+      console.error("Error al reintentar la generación de imagen:", error);
+    }
+  };
 
   if (!recipe) {
     return (
@@ -93,10 +131,26 @@ export default function RecipeDetailsPage() {
         ) : (
           <div className="w-full h-full bg-gray-200 rounded-lg sm:rounded-xl animate-pulse" />
         )}
-        {!recipe.imageUrl && (
+        {!recipe.imageUrl && recipe.imageStatus === "pending" && (
           <span className="absolute top-2 left-2 bg-yellow-400 text-white text-xs px-2 py-1 rounded shadow">
+            Esperando generación de imagen...
+          </span>
+        )}
+        {recipe.imageStatus === "generating" && (
+          <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded shadow animate-pulse">
             Generando imagen...
           </span>
+        )}
+        {recipe.imageStatus === "error" && (
+          <div className="absolute top-2 left-2 right-2 flex items-center justify-between bg-red-500 text-white text-xs px-2 py-1 rounded shadow">
+            <span>{recipe.imageError || "Error al generar la imagen"}</span>
+            <button
+              onClick={handleRetryGenerateImage}
+              className="ml-2 bg-white text-red-500 px-2 py-0.5 rounded text-xs hover:bg-red-50 transition-colors"
+            >
+              Reintentar
+            </button>
+          </div>
         )}
       </header>
 

@@ -28,6 +28,8 @@ export interface IRecipe {
   ingredients: Ingredient[];
   steps: Step[];
   imageUrl?: string;
+  imageStatus?: "pending" | "generating" | "completed" | "error";
+  imageError?: string;
   authorId?: string;
   isFavorite?: boolean;
   createdAt?: string;
@@ -46,6 +48,7 @@ export interface GenerateRecipeBody {
   servings: number;
   purpose: string;
   extraDetails: string;
+  useGemini?: boolean; // Nueva propiedad opcional
 }
 
 export interface IUser {
@@ -79,18 +82,4 @@ export interface AIRecipeData {
     stepNumber: number;
     description: string;
   }>;
-}
-
-export interface GenerateRecipeBody {
-  selectedCuisines: string[];
-  dietRestrictions: string[];
-  extraAllergens: string;
-  ingredientsToInclude: string[];
-  ingredientsToExclude: string[];
-  time: string;
-  difficulty: string;
-  cost: string;
-  servings: number;
-  purpose: string;
-  extraDetails: string;
 }

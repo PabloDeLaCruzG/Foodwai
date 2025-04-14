@@ -1,4 +1,4 @@
-import { Document, Schema, model, Types } from "mongoose";
+import { Document, Schema, model, models, Types } from "mongoose";
 
 export interface INutritionalInfo {
   calories: number;
@@ -33,6 +33,8 @@ export interface IRecipe extends Document {
   updatedAt?: Date;
   imageUrl?: string;
   isFavorite?: boolean;
+  imageStatus?: "pending" | "generating" | "completed" | "error";
+  imageError?: string;
 }
 
 const RecipeSchema = new Schema<IRecipe>(
@@ -92,6 +94,15 @@ const RecipeSchema = new Schema<IRecipe>(
       type: String,
       required: false,
     },
+    imageStatus: {
+      type: String,
+      enum: ["pending", "generating", "completed", "error"],
+      default: "pending",
+    },
+    imageError: {
+      type: String,
+      required: false,
+    },
     authorId: {
       type: Schema.Types.ObjectId,
       ref: "User",
@@ -107,6 +118,7 @@ const RecipeSchema = new Schema<IRecipe>(
   }
 );
 
-const Recipe = model<IRecipe>("Recipe", RecipeSchema);
+// Evitar la recompilación del modelo si ya existe
+const Recipe = models.Recipe || model<IRecipe>("Recipe", RecipeSchema);
 
 export default Recipe;
