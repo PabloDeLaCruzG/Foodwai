@@ -1,6 +1,7 @@
 import axios from "axios";
 import { GenerateRecipeBody, IRecipe, IUser } from "./interfaces";
 import config from "./config";
+import { getCookie, parseJwt } from "./utils/authUtils";
 
 // Configurar axios para usar la URL base según el entorno
 const api = axios.create({
@@ -95,20 +96,45 @@ export const recipeApi = {
     }
   },
 
-  generateImageForRecipe: async (recipeId: string) => {
+  async generateImageForRecipe(recipeId: string) {
     try {
-      const response = await api.post(
-        "/api/recipes/generateImage",
-        { recipeId },
+      const token = getCookie("token");
+      if (!token) {
+        throw new Error("No hay token de autenticación");
+      }
+
+      const userId = parseJwt(token).id;
+
+      // Confirmación antes de reintentar si ya hubo un error previo
+      const recipe = await this.getRecipeById(recipeId);
+      if (recipe.imageStatus === "error") {
+        if (
+          !confirm(
+            "Hubo un error previo al generar la imagen. ¿Desea intentar nuevamente?"
+          )
+        ) {
+          return;
+        }
+      }
+
+      const response = await fetch(
+        `${config.apiUrl}/api/recipes/generate-image-now`,
         {
+          method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
+          body: JSON.stringify({ recipeId, userId }),
         }
       );
-      return response.data;
+
+      if (!response.ok) {
+        throw new Error("Error al generar la imagen");
+      }
+
+      return response.json();
     } catch (error) {
-      console.error("Error al generar la imagen de la receta:", error);
+      console.error("Error en generateImageForRecipe:", error);
       throw error;
     }
   },
