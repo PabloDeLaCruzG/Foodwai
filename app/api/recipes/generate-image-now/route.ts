@@ -1,38 +1,47 @@
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
 import Recipe from "@/app/lib/models/Recipe";
+import User from "@/app/lib/models/User";
 import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
 import jwt from "jsonwebtoken";
+import mongoose from "mongoose";
 
-export async function POST(req: Request) {
+export async function POST(req: NextRequest) {
   try {
     console.log("🟢 [generate-image-now] Inicio de ejecución");
-
-    // Verificar el token de autorización
-    const authHeader = req.headers.get("Authorization");
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return NextResponse.json(
-        { error: "Token de autorización no proporcionado" },
-        { status: 401 }
-      );
-    }
-
-    const token = authHeader.split(" ")[1];
-    let decoded;
-    try {
-      decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
-        id: string;
-      };
-    } catch {
-      return NextResponse.json(
-        { error: "Token inválido o expirado" },
-        { status: 401 }
-      );
-    }
-
     await connectDB();
-    const { recipeId } = await req.json();
+
+    const token = req.cookies.get("token")?.value;
+    if (!token) {
+      return NextResponse.json(
+        { message: "Token no proporcionado" },
+        { status: 401 }
+      );
+    }
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id: string;
+    };
     const userId = decoded.id;
+
+    const { recipeId } = await req.json();
+
+    // Validar que recipeId es un ObjectId válido
+    if (!mongoose.Types.ObjectId.isValid(recipeId)) {
+      return NextResponse.json(
+        { error: "ID de receta inválido" },
+        { status: 400 }
+      );
+    }
+
+    // Verificar que el usuario existe
+    const user = await User.findById(userId);
+    if (!user) {
+      return NextResponse.json(
+        { error: "Usuario no encontrado" },
+        { status: 401 }
+      );
+    }
 
     const recipe = await Recipe.findOne({ _id: recipeId, authorId: userId });
     if (!recipe) {
@@ -76,6 +85,9 @@ export async function POST(req: Request) {
     }
   } catch (err) {
     console.error("❌ Error en generate-image-now:", err);
-    return NextResponse.json({ error: "Error interno" }, { status: 500 });
+    return NextResponse.json(
+      { error: "Error en el servidor al procesar la solicitud" },
+      { status: 500 }
+    );
   }
 }
