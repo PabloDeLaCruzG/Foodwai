@@ -1,10 +1,23 @@
 import { openai } from "../openai";
+import { geminiPro } from "../gemini";
 import { AIRecipeData } from "../interfaces";
 import { uploadToCloudinary } from "@/app/lib/utils/cloudinaryHelper";
 import axios from "axios";
 
 export class AIRecipeService {
-  static async generateRecipeFromPrompt(prompt: string): Promise<AIRecipeData> {
+  static async generateRecipeFromPrompt(
+    prompt: string,
+    useGemini: boolean = false
+  ): Promise<AIRecipeData> {
+    if (useGemini) {
+      return this.generateRecipeWithGemini(prompt);
+    }
+    return this.generateRecipeWithOpenAI(prompt);
+  }
+
+  private static async generateRecipeWithOpenAI(
+    prompt: string
+  ): Promise<AIRecipeData> {
     try {
       const response = await openai.chat.completions.create({
         model: "gpt-3.5-turbo-1106",
@@ -27,19 +40,14 @@ export class AIRecipeService {
         throw new Error("La API de OpenAI no devolvió resultado");
       }
 
-      // Limpiar backticks o fences
       let cleanedResponse = aiResult.replace(/```/g, "").trim();
-
-      // Extraer el contenido JSON si hubiera texto adicional
       const match = cleanedResponse.match(/\{[\s\S]*\}/);
       if (match) {
         cleanedResponse = match[0];
       }
 
-      // Parsear con JSON
       const recipeData: AIRecipeData = JSON.parse(cleanedResponse);
 
-      // Forzamos a que tenga un array de steps, y que no esté vacío
       if (
         !recipeData.steps ||
         !Array.isArray(recipeData.steps) ||
@@ -57,6 +65,51 @@ export class AIRecipeService {
     }
   }
 
+  private static async generateRecipeWithGemini(
+    prompt: string
+  ): Promise<AIRecipeData> {
+
+    console.log("📝 Prompt preparado, llamando a Gemini");
+    
+    try {
+      const result = await geminiPro.generateContent([
+        "Debes responder ÚNICAMENTE con JSON válido, sin comentarios ni explicaciones adicionales. " +
+          "El JSON debe contener una receta con title, description, cookingTime, difficulty, costLevel, " +
+          "cuisine, nutritionalInfo (con calories, protein, fat, carbs), ingredients (array con name, " +
+          "quantity, unit), y steps (array con stepNumber y description). Idioma: es. " +
+          prompt,
+      ]);
+
+      const response = await result.response;
+      console.log("Response Gemini", response);
+      const text = response.text();
+
+      // Extraer el JSON de la respuesta
+      const jsonMatch = text.match(/\{[\s\S]*\}/);
+      if (!jsonMatch) {
+        throw new Error("No se encontró JSON válido en la respuesta de Gemini");
+      }
+
+      const recipeData: AIRecipeData = JSON.parse(jsonMatch[0]);
+
+      if (
+        !recipeData.steps ||
+        !Array.isArray(recipeData.steps) ||
+        !recipeData.steps.length
+      ) {
+        throw new Error(
+          "La respuesta no contiene pasos de elaboración o su formato es inválido."
+        );
+      }
+
+      return recipeData;
+    } catch (error) {
+      console.error("Error al generar receta con Gemini:", error);
+      throw error;
+    }
+  }
+
+  // Mantenemos el método de generación de imágenes con OpenAI ya que Gemini no puede generar imágenes
   static async generateRecipeImage(
     recipeTitle: string,
     ingredients: { name: string }[],

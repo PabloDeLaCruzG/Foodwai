@@ -68,6 +68,7 @@ export async function POST(req: NextRequest) {
       servings,
       purpose,
       extraDetails,
+      useGemini, // Nuevo parámetro
     } = bodyData;
 
     const cuisinesStr = selectedCuisines?.join(", ") || "no specific cuisines";
@@ -88,7 +89,7 @@ export async function POST(req: NextRequest) {
       Raciones: ${servings}
       Propósito: ${purpose || "general"}
       Detalles extra: ${extraDetails || "ninguno"}
-
+    
       Devuelve un JSON ESTRICTAMENTE válido con la siguiente estructura:
       {
         "title": "string",
@@ -122,8 +123,11 @@ export async function POST(req: NextRequest) {
     console.log("📝 Prompt preparado, llamando a OpenAI");
 
     try {
-      const recipeData = await AIRecipeService.generateRecipeFromPrompt(prompt);
-      console.log("✅ Receta generada por OpenAI");
+      const recipeData = await AIRecipeService.generateRecipeFromPrompt(
+        prompt,
+        useGemini
+      );
+      console.log("✅ Receta generada por", useGemini ? "Gemini" : "OpenAI");
 
       const newRecipe = new Recipe({
         ...recipeData,
@@ -141,15 +145,16 @@ export async function POST(req: NextRequest) {
         },
         { status: 201 }
       );
-    } catch (openaiError) {
-      console.error("❌ Error con OpenAI:", openaiError);
+    } catch (aiError) {
+      console.error(
+        `❌ Error con ${useGemini ? "Gemini" : "OpenAI"}:`,
+        aiError
+      );
       return NextResponse.json(
         {
-          message: "Error al generar la receta con OpenAI",
+          message: `Error al generar la receta con ${useGemini ? "Gemini" : "OpenAI"}`,
           error:
-            openaiError instanceof Error
-              ? openaiError.message
-              : "Error desconocido",
+            aiError instanceof Error ? aiError.message : "Error desconocido",
         },
         { status: 500 }
       );

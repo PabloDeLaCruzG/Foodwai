@@ -98,6 +98,7 @@ export default function WizardModal({ onClose }: WizardModalProps) {
       servings,
       purpose,
       extraDetails,
+      useGemini: true, // Activando el uso de Gemini
     };
 
     console.log("userPreferences", userPreferences);
