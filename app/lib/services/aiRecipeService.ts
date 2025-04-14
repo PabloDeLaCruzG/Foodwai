@@ -1,8 +1,8 @@
 import { openai } from "../openai";
 import { getGeminiModels } from "../gemini";
 import { AIRecipeData } from "../interfaces";
-// import { uploadToCloudinary } from "@/app/lib/utils/cloudinaryHelper";
-// import axios from "axios";
+import { uploadToCloudinary } from "../utils/cloudinaryHelper";
+import axios from "axios";
 
 export class AIRecipeService {
   static async generateRecipeFromPrompt(
@@ -110,62 +110,21 @@ export class AIRecipeService {
     }
   }
 
-  // Mantenemos el método principal de generación de imágenes
+  // Método principal de generación de imágenes
   static async generateRecipeImage(
     recipeTitle: string,
     ingredients: { name: string }[],
     steps: { description: string }[]
   ): Promise<string> {
     try {
-      // Intentamos primero con Gemini
-      try {
-        const geminiImageUrl = await this.generateRecipeImageWithGemini(
-          recipeTitle,
-          ingredients,
-          steps
-        );
-        return geminiImageUrl;
-      } catch (geminiError) {
-        console.log(
-          "Error con Gemini, usando OpenAI como respaldo:",
-          geminiError
-        );
-        // Si falla Gemini, usamos OpenAI como respaldo
-        return this.generateRecipeImageWithOpenAI(
-          recipeTitle,
-          ingredients,
-          steps
-        );
-      }
-    } catch (error) {
-      console.error("Error al generar imagen:", error);
-      throw error;
-    }
-  }
-
-  private static async generateRecipeImageWithGemini(
-    recipeTitle: string,
-    ingredients: { name: string }[],
-    steps: { description: string }[]
-  ): Promise<string> {
-    const ingString = ingredients.map((i) => i.name).join(", ");
-    const stepsString = steps.map((s) => s.description).join(". ");
-
-    const prompt = `Foto realista y profesional del plato: ${recipeTitle}, que lleva: ${ingString}. Elaboración: ${stepsString}. Fondo neutro, buena iluminación.`;
-
-    try {
-      const { geminiProVision } = getGeminiModels();
-      const result = await geminiProVision.generateContent(prompt);
-      const response = await result.response;
-      const imageUrl = response.text();
-
-      if (!imageUrl) {
-        throw new Error("No se pudo generar la imagen con Gemini");
-      }
-
+      const imageUrl = await this.generateRecipeImageWithOpenAI(
+        recipeTitle,
+        ingredients,
+        steps
+      );
       return imageUrl;
     } catch (error) {
-      console.error("Error generando imagen con Gemini:", error);
+      console.error("Error al generar imagen:", error);
       throw error;
     }
   }
@@ -181,7 +140,9 @@ export class AIRecipeService {
     const response = await openai.images.generate({
       prompt: `Foto realista y profesional del plato: ${recipeTitle}, que lleva: ${ingString}. Elaboración: ${stepsString}. Fondo neutro, buena iluminación.`,
       n: 1,
-      size: "256x256",
+      size: "1024x1024",
+      model: "dall-e-3",
+      quality: "standard",
       response_format: "url",
     });
 
@@ -189,6 +150,14 @@ export class AIRecipeService {
       throw new Error("No se pudo generar la imagen con OpenAI");
     }
 
-    return response.data[0].url;
+    // Descargar la imagen de OpenAI
+    const imageResponse = await axios.get(response.data[0].url, {
+      responseType: "arraybuffer",
+    });
+    const buffer = Buffer.from(imageResponse.data);
+
+    // Subir a Cloudinary
+    const cloudinaryUrl = await uploadToCloudinary(buffer);
+    return cloudinaryUrl;
   }
 }

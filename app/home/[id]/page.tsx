@@ -8,6 +8,10 @@ import {
   ArrowLongLeftIcon,
   ClockIcon,
   BanknotesIcon,
+  UserIcon,
+  FireIcon,
+  BeakerIcon,
+  ChartBarIcon,
 } from "@heroicons/react/24/solid";
 import { IRecipe } from "../../lib/interfaces"; // Ajusta la ruta según tu proyecto
 import { recipeApi } from "../../lib/data"; // Ajusta según tu API
@@ -107,206 +111,204 @@ export default function RecipeDetailsPage() {
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-3 sm:px-4 py-4 sm:py-8 text-gray-800">
-      {/* Botón Volver */}
-      <div className="flex items-center mb-4 sm:mb-6">
-        <Link
-          href="/home"
-          className="inline-flex items-center text-gray-700 hover:text-gray-900"
-        >
-          <ArrowLongLeftIcon className="w-4 h-4 sm:w-5 sm:h-5 mr-1" />
-          <span className="text-sm sm:text-base font-medium">Volver</span>
-        </Link>
-      </div>
-
-      {/* Encabezado / Imagen principal */}
-      <header className="relative w-full h-48 sm:h-64 mb-4 sm:mb-6">
+    <div className="min-h-screen bg-gray-50">
+      {/* Hero Section con imagen de fondo */}
+      <div className="relative h-[50vh] min-h-[400px] w-full">
         {recipe.imageUrl ? (
-          <img
-            src={recipe.imageUrl}
-            alt={recipe.title}
-            className="w-full h-full object-cover rounded-lg sm:rounded-xl shadow-md opacity-0 transition-opacity duration-700"
-            onLoad={(e) => e.currentTarget.classList.add("opacity-100")}
-          />
+          <>
+            <div className="absolute inset-0">
+              <img
+                src={recipe.imageUrl}
+                alt={recipe.title}
+                className="w-full h-full object-cover opacity-0 transition-opacity duration-700"
+                onLoad={(e) => e.currentTarget.classList.add("opacity-100")}
+              />
+              <div className="absolute inset-0 bg-gradient-to-b from-black/60 to-black/30" />
+            </div>
+          </>
         ) : (
-          <div className="w-full h-full bg-gray-200 rounded-lg sm:rounded-xl animate-pulse" />
+          <div className="absolute inset-0 bg-gradient-to-b from-orange-500 to-orange-600 animate-pulse" />
         )}
+
+        {/* Contenido del Hero */}
+        <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 md:p-12 max-w-7xl mx-auto">
+          <Link
+            href="/home"
+            className="inline-flex items-center text-white mb-6 hover:text-orange-200 transition-colors"
+          >
+            <ArrowLongLeftIcon className="w-5 h-5 mr-2" />
+            <span className="text-sm sm:text-base font-medium">Volver</span>
+          </Link>
+
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
+            {recipe.title}
+          </h1>
+          <p className="text-lg sm:text-xl text-white/90 max-w-3xl mb-6">
+            {recipe.description}
+          </p>
+
+          {/* Stats rápidos */}
+          <div className="flex flex-wrap gap-4 text-white/90">
+            <div className="flex items-center gap-2">
+              <ClockIcon className="w-5 h-5" />
+              <span>{recipe.cookingTime} min</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <UserIcon className="w-5 h-5" />
+              <span>{recipe.difficulty}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <BanknotesIcon className="w-5 h-5" />
+              <span>{recipe.costLevel}</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Estados de generación de imagen */}
         {!recipe.imageUrl && recipe.imageStatus === "pending" && (
-          <span className="absolute top-2 left-2 bg-yellow-400 text-white text-xs px-2 py-1 rounded shadow">
-            Esperando generación de imagen...
-          </span>
-        )}
-        {recipe.imageStatus === "generating" && (
-          <span className="absolute top-2 left-2 bg-orange-500 text-white text-xs px-2 py-1 rounded shadow animate-pulse">
-            Generando imagen...
-          </span>
-        )}
-        {recipe.imageStatus === "error" && (
-          <div className="absolute top-2 left-2 right-2 flex items-center justify-between bg-red-500 text-white text-xs px-2 py-1 rounded shadow">
-            <span>{recipe.imageError || "Error al generar la imagen"}</span>
-            <button
-              onClick={handleRetryGenerateImage}
-              className="ml-2 bg-white text-red-500 px-2 py-0.5 rounded text-xs hover:bg-red-50 transition-colors"
-            >
-              Reintentar
-            </button>
+          <div className="absolute top-4 left-4 right-4 flex justify-center">
+            <span className="bg-yellow-400 text-white text-sm px-6 py-2 rounded-full shadow-lg">
+              Esperando generación de imagen...
+            </span>
           </div>
         )}
-      </header>
-
-      {/* Título y descripción */}
-      <div className="mb-6 sm:mb-8">
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mb-2">
-          {recipe.title}
-        </h1>
-        <p className="text-sm sm:text-base text-gray-600">
-          {recipe.description}
-        </p>
+        {recipe.imageStatus === "generating" && (
+          <div className="absolute top-4 left-4 right-4 flex justify-center">
+            <span className="bg-orange-500 text-white text-sm px-6 py-2 rounded-full shadow-lg animate-pulse">
+              Generando imagen...
+            </span>
+          </div>
+        )}
+        {recipe.imageStatus === "error" && (
+          <div className="absolute top-4 left-4 right-4 flex justify-center">
+            <div className="bg-red-500 text-white text-sm px-6 py-2 rounded-full shadow-lg flex items-center gap-4">
+              <span>{recipe.imageError || "Error al generar la imagen"}</span>
+              <button
+                onClick={handleRetryGenerateImage}
+                className="bg-white text-red-500 px-4 py-1 rounded-full text-sm hover:bg-red-50 transition-colors"
+              >
+                Reintentar
+              </button>
+            </div>
+          </div>
+        )}
       </div>
 
-      <main>
-        {/* GRID con Info General + Info Nutricional */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6">
-          {/* Sección Info General */}
-          <section className="col-span-1 md:col-span-2 bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl shadow-md">
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-3">
-              <div className="flex items-center gap-2 text-gray-600">
-                <ClockIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-300" />
-                <span className="font-semibold text-sm sm:text-base">
-                  Tiempo
-                </span>
-              </div>
-              <p className="text-sm sm:text-base">{recipe.cookingTime} min</p>
-            </div>
-
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-3">
-              <div className="flex items-center gap-2 text-gray-600">
-                <span className="font-semibold text-sm sm:text-base">
-                  Dificultad
-                </span>
-              </div>
-              <p className="text-sm sm:text-base">{recipe.difficulty}</p>
-            </div>
-
-            <div className="flex items-center justify-between border-b border-gray-200 pb-3 mb-3">
-              <div className="flex items-center gap-2 text-gray-600">
-                <BanknotesIcon className="w-4 h-4 sm:w-5 sm:h-5 text-orange-300" />
-                <span className="font-semibold text-sm sm:text-base">
-                  Coste
-                </span>
-              </div>
-              <p className="text-sm sm:text-base">{recipe.costLevel}</p>
-            </div>
-
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-gray-600">
-                <span className="font-semibold text-sm sm:text-base">
-                  Cocina
-                </span>
-              </div>
-              <p className="text-sm sm:text-base">{recipe.cuisine}</p>
-            </div>
-          </section>
-          {/* Sección Información Nutricional */}
-          <aside className="bg-white p-3 sm:p-4 rounded-lg sm:rounded-xl shadow-md">
-            <h2 className="text-lg sm:text-xl font-semibold mb-4">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-10 relative z-10 pb-12">
+        <div className="grid gap-6 md:grid-cols-3 lg:gap-8">
+          {/* Info Nutricional */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 order-2 md:order-1">
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-900">
+              <ChartBarIcon className="w-6 h-6 text-orange-500" />
               Información Nutricional
             </h2>
 
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-gray-700">
-                <span>Calorías</span>
-                <span className="font-bold">
-                  {recipe.nutritionalInfo.calories} Kcal
-                </span>
+            <div className="space-y-6">
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600 flex items-center gap-2">
+                    <FireIcon className="w-5 h-5 text-orange-400" />
+                    Calorías
+                  </span>
+                  <span className="font-bold text-gray-900">
+                    {recipe.nutritionalInfo.calories} Kcal
+                  </span>
+                </div>
+                <SquareBar
+                  filled={getFilledSquares(
+                    recipe.nutritionalInfo.calories,
+                    "calories"
+                  )}
+                />
               </div>
-              <SquareBar
-                filled={getFilledSquares(
-                  recipe.nutritionalInfo.calories,
-                  "calories"
-                )}
-              />
-            </div>
 
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-gray-700">
-                <span>Proteína</span>
-                <span className="font-bold">
-                  {recipe.nutritionalInfo.protein} g
-                </span>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600">Proteína</span>
+                  <span className="font-bold text-gray-900">
+                    {recipe.nutritionalInfo.protein}g
+                  </span>
+                </div>
+                <SquareBar
+                  filled={getFilledSquares(
+                    recipe.nutritionalInfo.protein,
+                    "protein"
+                  )}
+                />
               </div>
-              <SquareBar
-                filled={getFilledSquares(
-                  recipe.nutritionalInfo.protein,
-                  "protein"
-                )}
-              />
-            </div>
 
-            <div className="mb-4">
-              <div className="flex items-center justify-between text-sm text-gray-700">
-                <span>Carbohidratos</span>
-                <span className="font-bold">
-                  {recipe.nutritionalInfo.carbs} g
-                </span>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600">Carbohidratos</span>
+                  <span className="font-bold text-gray-900">
+                    {recipe.nutritionalInfo.carbs}g
+                  </span>
+                </div>
+                <SquareBar
+                  filled={getFilledSquares(
+                    recipe.nutritionalInfo.carbs,
+                    "carbs"
+                  )}
+                />
               </div>
-              <SquareBar
-                filled={getFilledSquares(recipe.nutritionalInfo.carbs, "carbs")}
-              />
-            </div>
 
-            <div>
-              <div className="flex items-center justify-between text-sm text-gray-700">
-                <span>Grasas</span>
-                <span className="font-bold">
-                  {recipe.nutritionalInfo.fat} g
-                </span>
+              <div>
+                <div className="flex items-center justify-between mb-2">
+                  <span className="text-gray-600">Grasas</span>
+                  <span className="font-bold text-gray-900">
+                    {recipe.nutritionalInfo.fat}g
+                  </span>
+                </div>
+                <SquareBar
+                  filled={getFilledSquares(recipe.nutritionalInfo.fat, "fat")}
+                />
               </div>
-              <SquareBar
-                filled={getFilledSquares(recipe.nutritionalInfo.fat, "fat")}
-              />
             </div>
-          </aside>
+          </div>
+
+          {/* Ingredientes */}
+          <div className="bg-white rounded-2xl shadow-xl p-6 col-span-2 order-1 md:order-2">
+            <h2 className="text-xl font-bold mb-6 flex items-center gap-2 text-gray-900">
+              <BeakerIcon className="w-6 h-6 text-orange-500" />
+              Ingredientes
+            </h2>
+            <div className="grid sm:grid-cols-2 gap-4">
+              {recipe.ingredients.map((item, index) => (
+                <div
+                  key={index}
+                  className="flex items-center p-4 bg-orange-50 rounded-xl border border-orange-100 hover:border-orange-200 transition-colors"
+                >
+                  <div className="w-12 h-12 bg-orange-100 rounded-lg flex items-center justify-center mr-4">
+                    <span className="text-orange-600 font-bold">
+                      {item.quantity}
+                    </span>
+                  </div>
+                  <div>
+                    <span className="text-sm text-orange-600 font-medium block">
+                      {item.unit}
+                    </span>
+                    <span className="text-gray-900">{item.name}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
-        {/* Sección de Ingredientes - estilo “tarjetado” en grid */}
-        <section className="bg-white p-3 sm:p-4 mt-4 sm:mt-6 rounded-lg sm:rounded-xl shadow-md">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-900">
-            Ingredientes
-          </h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4">
-            {recipe.ingredients.map((item, index) => (
-              <div
-                key={index}
-                className="flex items-center gap-2 p-3 bg-gray-50 rounded-lg shadow-sm"
-              >
-                <span className="text-sm font-semibold text-orange-500">
-                  {item.quantity} {item.unit}
-                </span>
-                <span className="text-gray-700">{item.name}</span>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* Sección de Pasos - estilo “timeline” */}
-        <section className="bg-white p-3 sm:p-4 mt-4 sm:mt-6 rounded-lg sm:rounded-xl shadow-md">
-          <h2 className="text-lg sm:text-xl font-semibold mb-4 text-gray-900">
-            Preparación
-          </h2>
-
-          {/* Contenedor con una línea a la izquierda simulando un timeline */}
-          <div className="relative border-l-4 border-orange-300 pl-4 sm:pl-6">
+        {/* Pasos de preparación */}
+        <section className="mt-8 bg-white rounded-2xl shadow-xl p-6">
+          <h2 className="text-xl font-bold mb-8 text-gray-900">Preparación</h2>
+          <div className="space-y-8">
             {recipe.steps.map((step, index) => (
-              <div key={index} className="mb-6 relative">
-                {/* Pequeño círculo para cada paso */}
-                <div className="w-3 h-3 sm:w-4 sm:h-4 bg-orange-300 rounded-full absolute -left-2 sm:-left-2.5 top-1" />
-                <h3 className="font-semibold mb-1 ml-2 sm:ml-4 text-sm sm:text-base">
-                  Paso {step.stepNumber}
-                </h3>
-                <p className="text-gray-700 text-sm sm:text-base">
-                  {step.description}
-                </p>
+              <div key={index} className="flex gap-6">
+                <div className="flex-none">
+                  <div className="w-8 h-8 bg-orange-100 rounded-full flex items-center justify-center text-orange-600 font-bold">
+                    {step.stepNumber}
+                  </div>
+                </div>
+                <div className="flex-1">
+                  <p className="text-gray-700">{step.description}</p>
+                </div>
               </div>
             ))}
           </div>
