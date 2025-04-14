@@ -1,12 +1,21 @@
 import axios from "axios";
 import { GenerateRecipeBody, IRecipe, IUser } from "./interfaces";
 import config from "./config";
-import { getCookie, parseJwt } from "./utils/authUtils";
+import { getCookie } from "./utils/authUtils";
 
 // Configurar axios para usar la URL base según el entorno
 const api = axios.create({
   baseURL: config.apiUrl,
   withCredentials: true,
+});
+
+// Añadir interceptor para incluir el token en todas las peticiones
+api.interceptors.request.use((config) => {
+  const token = getCookie("token");
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
 });
 
 export const recipeApi = {
@@ -98,15 +107,23 @@ export const recipeApi = {
 
   async generateImageForRecipe(recipeId: string) {
     try {
+      // Intentamos obtener el token
       const token = getCookie("token");
-      if (!token) {
-        throw new Error("No hay token de autenticación");
+
+      // Si no hay token en las cookies, intentamos obtenerlo de localStorage como respaldo
+      const localToken =
+        typeof window !== "undefined" ? localStorage.getItem("token") : null;
+
+      if (!token && !localToken) {
+        throw new Error(
+          "No has iniciado sesión. Por favor, inicia sesión para continuar."
+        );
       }
 
-      const userId = parseJwt(token).id;
-
-      // Confirmación antes de reintentar si ya hubo un error previo
+      // Intentamos obtener la receta primero
       const recipe = await this.getRecipeById(recipeId);
+
+      // Si ya hay un error previo, confirmamos antes de reintentar
       if (recipe.imageStatus === "error") {
         if (
           !confirm(
@@ -123,13 +140,16 @@ export const recipeApi = {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token || localToken}`,
           },
-          body: JSON.stringify({ recipeId, userId }),
+          credentials: "include",
+          body: JSON.stringify({ recipeId }),
         }
       );
 
       if (!response.ok) {
-        throw new Error("Error al generar la imagen");
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al generar la imagen");
       }
 
       return response.json();

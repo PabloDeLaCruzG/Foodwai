@@ -2,14 +2,37 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
 import Recipe from "@/app/lib/models/Recipe";
 import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
-import config from "@/app/lib/config";
+import jwt from "jsonwebtoken";
 
 export async function POST(req: Request) {
   try {
     console.log("🟢 [generate-image-now] Inicio de ejecución");
 
+    // Verificar el token de autorización
+    const authHeader = req.headers.get("Authorization");
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return NextResponse.json(
+        { error: "Token de autorización no proporcionado" },
+        { status: 401 }
+      );
+    }
+
+    const token = authHeader.split(" ")[1];
+    let decoded;
+    try {
+      decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+        id: string;
+      };
+    } catch {
+      return NextResponse.json(
+        { error: "Token inválido o expirado" },
+        { status: 401 }
+      );
+    }
+
     await connectDB();
-    const { recipeId, userId } = await req.json();
+    const { recipeId } = await req.json();
+    const userId = decoded.id;
 
     const recipe = await Recipe.findOne({ _id: recipeId, authorId: userId });
     if (!recipe) {
@@ -33,25 +56,13 @@ export async function POST(req: Request) {
         recipe.ingredients,
         recipe.steps
       );
-      console.log("🖼️ Imagen generada:", imageUrl);
 
-      // Enviamos la imagen al worker para su procesamiento
-      fetch(`${config.apiUrl}/api/recipes/generate-image-worker`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ recipeId, userId, imageUrl }),
-      }).catch((err) => {
-        console.error(
-          "❌ Error lanzando guardado de imagen en background:",
-          err
-        );
-        recipe.imageStatus = "error";
-        recipe.imageError = "Error al procesar la imagen";
-        recipe.save();
-      });
+      // Actualizamos la receta con la URL generada
+      recipe.imageUrl = imageUrl;
+      recipe.imageStatus = "completed";
+      await recipe.save();
 
+      console.log("✅ Imagen generada y guardada correctamente");
       return NextResponse.json({ success: true, imageUrl });
     } catch (err) {
       console.error("❌ Error generando imagen:", err);
@@ -64,7 +75,7 @@ export async function POST(req: Request) {
       );
     }
   } catch (err) {
-    console.error("❌ Error general:", err);
+    console.error("❌ Error en generate-image-now:", err);
     return NextResponse.json({ error: "Error interno" }, { status: 500 });
   }
 }
