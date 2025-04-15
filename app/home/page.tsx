@@ -7,7 +7,7 @@ import RecipeCard from "../components/RecipeCard";
 import { SparklesIcon } from "@heroicons/react/24/solid";
 import WizardModal from "../components/WizardModal";
 import { useAuth } from "../context/AuthContext";
-import AsideSection from "../components/AsideSection";
+//import AsideSection from "../components/AsideSection";
 import Image from "next/image";
 import AdModal from "../components/AdModal";
 import FilterTabs from "../components/filters/FilterTabs";
@@ -180,9 +180,9 @@ export default function Home() {
 
   return (
     <main className="h-[calc(100vh-64px)] flex">
-      <aside className="hidden lg:block w-64 p-4 py-6 custom-scrollbar">
+      {/* <aside className="hidden lg:block w-64 p-4 py-6 custom-scrollbar">
         <AsideSection onRecipeSave={fetchRecipes} />
-      </aside>
+      </aside> */}
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
         <div className="max-w-7xl mx-auto">
           {/* Barra de filtros */}
