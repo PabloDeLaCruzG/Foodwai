@@ -16,6 +16,7 @@ import {
 import { IRecipe } from "../../lib/interfaces"; // Ajusta la ruta según tu proyecto
 import { recipeApi } from "../../lib/data"; // Ajusta según tu API
 import SquareBar from "@/app/components/SquareBar";
+import AdSenseDisplay from "@/app/components/AdSenseDisplay";
 
 // Rango de ejemplo para calcular las barras (o cuadrados) de nutrientes
 const NUTRIENT_RANGES = {
@@ -293,6 +294,11 @@ export default function RecipeDetailsPage() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Anuncio entre ingredientes y pasos */}
+        <div className="my-8 flex justify-center">
+          <AdSenseDisplay slot="6789012345" />
         </div>
 
         {/* Pasos de preparación */}
