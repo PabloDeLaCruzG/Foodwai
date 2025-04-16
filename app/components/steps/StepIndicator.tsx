@@ -1,5 +1,6 @@
 "use client";
 import React from "react";
+import { CheckIcon } from "@heroicons/react/24/solid";
 
 interface StepIndicatorProps {
   currentStep: number;
@@ -11,85 +12,86 @@ export default function StepIndicator({
   steps,
 }: StepIndicatorProps) {
   return (
-    <div className="relative">
-      {/* Línea de progreso */}
-      <div
-        className="absolute top-5 left-0 h-0.5 bg-gray-200"
-        style={{ width: "100%" }}
-      >
-        <div
-          className="h-full bg-orange-500 transition-all duration-500"
-          style={{
-            width: `${((currentStep - 1) / (steps.length - 1)) * 100}%`,
-          }}
-        />
-      </div>
-
-      {/* Steps */}
-      <div className="relative flex justify-between">
+    <nav aria-label="Progress" className="px-4">
+      <ol role="list" className="flex items-center">
         {steps.map((step, index) => {
-          const isCompleted = currentStep > index + 1;
-          const isCurrent = currentStep === index + 1;
+          const stepNumber = index + 1;
+          const isCurrentStep = currentStep === stepNumber;
+          const isCompleted = currentStep > stepNumber;
 
           return (
-            <div
+            <li
               key={step}
-              className={`flex flex-col items-center ${
-                index === steps.length - 1 ? "items-end" : ""
-              }`}
+              className={`relative ${index !== steps.length - 1 ? "flex-1" : ""}`}
             >
-              {/* Círculo indicador */}
-              <div
-                className={`
-                  w-4 h-4 sm:w-5 sm:h-5
-                  rounded-full
-                  border-2
-                  flex
-                  items-center
-                  justify-center
-                  transition-all
-                  duration-500
-                  ${
-                    isCompleted || isCurrent
-                      ? "border-orange-500 bg-orange-500"
-                      : "border-gray-300 bg-white"
-                  }
-                `}
-              >
+              {index !== steps.length - 1 && (
                 <div
-                  className={`
-                    w-2 h-2 sm:w-2.5 sm:h-2.5
-                    rounded-full
-                    ${
-                      isCompleted
-                        ? "bg-white"
-                        : isCurrent
-                          ? "bg-white"
-                          : "bg-transparent"
-                    }
-                  `}
+                  className={`absolute left-0 right-0 top-1/2 h-0.5 -translate-y-1/2 transition-colors ${
+                    isCompleted ? "bg-orange-500" : "bg-gray-200"
+                  }`}
+                  aria-hidden="true"
+                  style={{ left: "50%", width: "100%" }}
                 />
-              </div>
+              )}
 
-              {/* Label */}
-              <span
-                className={`
-                  mt-2
-                  text-xs sm:text-sm
-                  font-medium
-                  ${
-                    isCompleted || isCurrent
+              <div
+                className="group relative flex items-center justify-center"
+                aria-current={isCurrentStep ? "step" : undefined}
+              >
+                <span className="absolute flex h-5 w-5 p-px" aria-hidden="true">
+                  <span
+                    className={`h-full w-full rounded-full ${
+                      isCompleted
+                        ? "bg-orange-500"
+                        : isCurrentStep
+                          ? "bg-orange-500"
+                          : "bg-gray-200"
+                    } transition-colors duration-300`}
+                  />
+                </span>
+                <span
+                  className={`relative flex h-5 w-5 items-center justify-center rounded-full ${
+                    isCompleted || isCurrentStep
+                      ? "bg-orange-500"
+                      : "bg-gray-200"
+                  } transition-colors duration-300`}
+                >
+                  {isCompleted ? (
+                    <CheckIcon
+                      className="h-3 w-3 text-white"
+                      aria-hidden="true"
+                    />
+                  ) : (
+                    <span
+                      className={`text-xs font-semibold ${
+                        isCurrentStep ? "text-white" : "text-gray-600"
+                      }`}
+                    >
+                      {stepNumber}
+                    </span>
+                  )}
+                </span>
+                <span
+                  className={`absolute -bottom-7 whitespace-nowrap text-sm font-medium transition-colors ${
+                    isCompleted || isCurrentStep
                       ? "text-orange-500"
                       : "text-gray-500"
-                  }
-                `}
-              >
-                {step}
-              </span>
-            </div>
+                  }`}
+                >
+                  {step}
+                  <span className="sr-only">
+                    {isCompleted
+                      ? " completado"
+                      : isCurrentStep
+                        ? " actual"
+                        : ""}
+                  </span>
+                </span>
+              </div>
+            </li>
           );
         })}
-      </div>
-    </div>
+      </ol>
+    </nav>
   );
 }

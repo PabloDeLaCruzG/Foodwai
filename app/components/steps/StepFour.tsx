@@ -1,5 +1,6 @@
 "use client";
-import React from "react";
+import React, { useState } from "react";
+import ErrorMessage from "../ErrorMessage";
 
 interface StepFourProps {
   purpose: string;
@@ -17,16 +18,34 @@ interface StepFourProps {
   servings: number;
 }
 
-const purposes: string[] = [
-  "Comida diaria",
-  "Ocasión especial",
-  "Cena romántica",
-  "Reunión familiar",
-  "Fiesta",
-  "Saludable",
-  "Deportiva",
-  "Batch cooking",
-];
+// const purposes: string[] = [
+//   "Comida diaria",
+//   "Ocasión especial",
+//   "Cena romántica",
+//   "Reunión familiar",
+//   "Fiesta",
+//   "Saludable",
+//   "Deportiva",
+//   "Batch cooking",
+// ];
+
+const timeLabels: Record<string, string> = {
+  quick: "Rápido (15-30 min)",
+  medium: "Medio (30-60 min)",
+  long: "Elaborado (>60 min)",
+};
+
+const difficultyLabels: Record<string, string> = {
+  basic: "Básico",
+  intermediate: "Intermedio",
+  advanced: "Avanzado",
+};
+
+const costLabels: Record<string, string> = {
+  low: "Económico (<10€)",
+  medium: "Moderado (10-20€)",
+  high: "Premium (>20€)",
+};
 
 export default function StepFour({
   purpose,
@@ -43,194 +62,173 @@ export default function StepFour({
   cost,
   servings,
 }: StepFourProps) {
+  const [error, setError] = useState<string | null>(null);
+
+  const handlePurposeChange = (value: string) => {
+    try {
+      if (value.length > 200) {
+        throw new Error("El propósito no puede exceder los 200 caracteres");
+      }
+      setPurpose(value);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+        setTimeout(() => setError(null), 3000);
+      }
+    }
+  };
+
+  const handleExtraDetailsChange = (value: string) => {
+    try {
+      if (value.length > 500) {
+        throw new Error(
+          "Los detalles adicionales no pueden exceder los 500 caracteres"
+        );
+      }
+      setExtraDetails(value);
+    } catch (err) {
+      if (err instanceof Error) {
+        setError(err.message);
+        setTimeout(() => setError(null), 3000);
+      }
+    }
+  };
+
   return (
-    <div className="space-y-6">
-      <div>
-        <h2 className="text-lg sm:text-xl font-semibold mb-2">
-          Propósito de la receta
-        </h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-4">
-          ¿Para qué ocasión es esta receta?
-        </p>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-2">
-          {purposes.map((p: string) => (
-            <button
-              key={p}
-              onClick={() => setPurpose(p)}
-              className={`
-                p-2 sm:p-3
-                rounded-lg
-                border
-                text-sm sm:text-base
-                transition-all
-                duration-200
-                ${
-                  purpose === p
-                    ? "border-orange-500 bg-orange-50 text-orange-700"
-                    : "border-gray-200 hover:border-gray-300 text-gray-700"
-                }
-              `}
-            >
-              {p}
-            </button>
-          ))}
-        </div>
-      </div>
+    <div className="space-y-8">
+      {error && <ErrorMessage message={error} className="animate-slideIn" />}
 
       <div>
-        <h2 className="text-lg sm:text-xl font-semibold mb-2">
-          Detalles adicionales
-        </h2>
-        <p className="text-sm sm:text-base text-gray-600 mb-4">
-          ¿Hay algo más que quieras mencionar?
-        </p>
-        <textarea
-          value={extraDetails}
-          onChange={(e) => setExtraDetails(e.target.value)}
-          placeholder="Ej: Me gustaría que la receta sea saludable y fácil de preparar"
-          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[100px]"
-        />
-      </div>
-
-      <div className="border-t border-gray-200 pt-6">
-        <h2 className="text-lg sm:text-xl font-semibold mb-4">
+        <h3 className="text-lg font-semibold mb-2 text-gray-900">
           Resumen de preferencias
-        </h2>
-
-        <div className="space-y-4">
+        </h3>
+        <div className="bg-orange-50 rounded-lg p-4 space-y-4">
           {selectedCuisines.length > 0 && (
             <div>
-              <h3 className="text-sm sm:text-base font-medium text-gray-900">
-                Tipos de cocina:
-              </h3>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {selectedCuisines.map((cuisine) => (
-                  <span
-                    key={cuisine}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm bg-orange-100 text-orange-800"
-                  >
-                    {cuisine}
-                  </span>
-                ))}
-              </div>
+              <span className="text-sm font-medium text-orange-800">
+                Tipo de cocina:
+              </span>
+              <span className="text-sm text-orange-700 ml-2">
+                {selectedCuisines.join(", ")}
+              </span>
             </div>
           )}
 
           {dietRestrictions.length > 0 && (
             <div>
-              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+              <span className="text-sm font-medium text-orange-800">
                 Restricciones dietéticas:
-              </h3>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {dietRestrictions.map((diet) => (
-                  <span
-                    key={diet}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm bg-green-100 text-green-800"
-                  >
-                    {diet}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {ingredientsToInclude.length > 0 && (
-            <div>
-              <h3 className="text-sm sm:text-base font-medium text-gray-900">
-                Ingredientes a incluir:
-              </h3>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {ingredientsToInclude.map((ingredient) => (
-                  <span
-                    key={ingredient}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm bg-blue-100 text-blue-800"
-                  >
-                    {ingredient}
-                  </span>
-                ))}
-              </div>
-            </div>
-          )}
-
-          {ingredientsToExclude.length > 0 && (
-            <div>
-              <h3 className="text-sm sm:text-base font-medium text-gray-900">
-                Ingredientes a evitar:
-              </h3>
-              <div className="mt-1 flex flex-wrap gap-2">
-                {ingredientsToExclude.map((ingredient) => (
-                  <span
-                    key={ingredient}
-                    className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs sm:text-sm bg-red-100 text-red-800"
-                  >
-                    {ingredient}
-                  </span>
-                ))}
-              </div>
+              </span>
+              <span className="text-sm text-orange-700 ml-2">
+                {dietRestrictions.join(", ")}
+              </span>
             </div>
           )}
 
           {extraAllergens && (
             <div>
-              <h3 className="text-sm sm:text-base font-medium text-gray-900">
-                Alergias adicionales:
-              </h3>
-              <p className="mt-1 text-sm sm:text-base text-gray-600">
+              <span className="text-sm font-medium text-orange-800">
+                Alergias/Intolerancias:
+              </span>
+              <span className="text-sm text-orange-700 ml-2">
                 {extraAllergens}
-              </p>
+              </span>
             </div>
           )}
 
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          {ingredientsToInclude.length > 0 && (
             <div>
-              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+              <span className="text-sm font-medium text-orange-800">
+                Ingredientes a incluir:
+              </span>
+              <span className="text-sm text-orange-700 ml-2">
+                {ingredientsToInclude.join(", ")}
+              </span>
+            </div>
+          )}
+
+          {ingredientsToExclude.length > 0 && (
+            <div>
+              <span className="text-sm font-medium text-orange-800">
+                Ingredientes a excluir:
+              </span>
+              <span className="text-sm text-orange-700 ml-2">
+                {ingredientsToExclude.join(", ")}
+              </span>
+            </div>
+          )}
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+            <div>
+              <span className="text-sm font-medium text-orange-800 block">
                 Tiempo:
-              </h3>
-              <p className="mt-1 text-sm sm:text-base text-gray-600">
-                {time === "quick"
-                  ? "Rápido"
-                  : time === "medium"
-                    ? "Medio"
-                    : "Largo"}
-              </p>
+              </span>
+              <span className="text-sm text-orange-700">
+                {timeLabels[time]}
+              </span>
             </div>
-
             <div>
-              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+              <span className="text-sm font-medium text-orange-800 block">
                 Dificultad:
-              </h3>
-              <p className="mt-1 text-sm sm:text-base text-gray-600">
-                {difficulty === "basic"
-                  ? "Básico"
-                  : difficulty === "intermediate"
-                    ? "Intermedio"
-                    : "Avanzado"}
-              </p>
+              </span>
+              <span className="text-sm text-orange-700">
+                {difficultyLabels[difficulty]}
+              </span>
             </div>
-
             <div>
-              <h3 className="text-sm sm:text-base font-medium text-gray-900">
-                Coste:
-              </h3>
-              <p className="mt-1 text-sm sm:text-base text-gray-600">
-                {cost === "low"
-                  ? "Económico"
-                  : cost === "medium"
-                    ? "Moderado"
-                    : "Premium"}
-              </p>
+              <span className="text-sm font-medium text-orange-800 block">
+                Costo:
+              </span>
+              <span className="text-sm text-orange-700">
+                {costLabels[cost]}
+              </span>
             </div>
-
             <div>
-              <h3 className="text-sm sm:text-base font-medium text-gray-900">
+              <span className="text-sm font-medium text-orange-800 block">
                 Porciones:
-              </h3>
-              <p className="mt-1 text-sm sm:text-base text-gray-600">
-                {servings}
-              </p>
+              </span>
+              <span className="text-sm text-orange-700">{servings}</span>
             </div>
           </div>
         </div>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-2 text-gray-900">
+          ¿Para qué ocasión es la receta?
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          Por ejemplo: cena romántica, comida familiar, etc.
+        </p>
+        <textarea
+          value={purpose}
+          onChange={(e) => handlePurposeChange(e.target.value)}
+          placeholder="Describe la ocasión..."
+          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 h-24 resize-none"
+          maxLength={200}
+        />
+        <p className="text-sm text-gray-500 mt-1">
+          {purpose.length}/200 caracteres
+        </p>
+      </div>
+
+      <div>
+        <h3 className="text-lg font-semibold mb-2 text-gray-900">
+          Detalles adicionales
+        </h3>
+        <p className="text-sm text-gray-600 mb-4">
+          ¿Alguna preferencia específica que debamos tener en cuenta?
+        </p>
+        <textarea
+          value={extraDetails}
+          onChange={(e) => handleExtraDetailsChange(e.target.value)}
+          placeholder="Por ejemplo: preferencia de sabores, técnicas de cocina específicas..."
+          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 h-24 resize-none"
+          maxLength={500}
+        />
+        <p className="text-sm text-gray-500 mt-1">
+          {extraDetails.length}/500 caracteres
+        </p>
       </div>
     </div>
   );
