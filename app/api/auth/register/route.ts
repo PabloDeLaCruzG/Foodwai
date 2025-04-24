@@ -1,7 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
-import User from "@/app/lib/models/User"; // ajusta si tienes /models directamente en lib
+import User from "@/app/lib/models/User";
 import bcrypt from "bcryptjs";
+import jwt from "jsonwebtoken";
+
+const JWT_SECRET = process.env.JWT_SECRET || "secret";
+const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 
 const validatePassword = (
   password: string
@@ -71,22 +75,25 @@ export async function POST(req: NextRequest) {
     const hashedPassword = await bcrypt.hash(password, 12);
     const newUser = await User.create({ email, password: hashedPassword });
 
-    // Simulamos un token de sesión (puedes usar JWT luego)
-    const token = `mock-token-${newUser._id}`;
+    const token = jwt.sign({ id: newUser._id }, JWT_SECRET, {
+      expiresIn: JWT_EXPIRES_IN,
+    } as jwt.SignOptions);
 
     const response = NextResponse.json({
       message: "Usuario registrado",
-      user: newUser,
+      user: {
+        id: newUser._id,
+        email: newUser.email,
+        name: newUser.name,
+      },
     });
 
-    response.cookies.set({
-      name: "token",
-      value: token,
+    response.cookies.set("token", token, {
       httpOnly: true,
       secure: true,
       sameSite: "lax",
       path: "/",
-      maxAge: 60 * 60 * 24, // 1 día
+      maxAge: 24 * 60 * 60, // 1 día
     });
 
     return response;

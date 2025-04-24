@@ -135,22 +135,12 @@ export default function Home() {
     }
   };
 
-  const handleFavoriteToggle = async (updatedRecipe: IRecipe) => {
-    try {
-      setError(null);
-      const updated = await recipeApi.toggleFavorite(
-        updatedRecipe._id!,
-        !updatedRecipe.isFavorite
-      );
-      setRecipes((prevRecipes) =>
-        prevRecipes.map((recipe) =>
-          recipe._id === updated._id ? updated : recipe
-        )
-      );
-    } catch (error) {
-      console.error("Error al actualizar favorito:", error);
-      setError(getErrorMessage(error));
-    }
+  const handleFavoriteToggle = (updatedRecipe: IRecipe) => {
+    setRecipes(
+      recipes.map((recipe) =>
+        recipe._id === updatedRecipe._id ? updatedRecipe : recipe
+      )
+    );
   };
 
   const filteredRecipes = useMemo(() => {
