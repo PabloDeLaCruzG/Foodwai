@@ -26,15 +26,15 @@ const timeOptions = [
 ];
 
 const difficultyOptions = [
-  { value: "basic", label: "Básico" },
-  { value: "intermediate", label: "Intermedio" },
-  { value: "advanced", label: "Avanzado" },
+  { value: "Fácil", label: "Fácil" },
+  { value: "Media", label: "Media" },
+  { value: "Difícil", label: "Difícil" },
 ];
 
 const costOptions = [
-  { value: "low", label: "Económico" },
-  { value: "medium", label: "Moderado" },
-  { value: "high", label: "Premium" },
+  { value: "Económico", label: "Económico" },
+  { value: "Moderado", label: "Moderado" },
+  { value: "Alto", label: "Alto" },
 ];
 
 export default function StepThree({

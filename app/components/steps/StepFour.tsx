@@ -200,11 +200,7 @@ export default function StepFour({
                 Dificultad:
               </h3>
               <p className="mt-1 text-sm sm:text-base text-gray-600">
-                {difficulty === "basic"
-                  ? "Básico"
-                  : difficulty === "intermediate"
-                    ? "Intermedio"
-                    : "Avanzado"}
+                {difficulty}
               </p>
             </div>
 
@@ -212,13 +208,7 @@ export default function StepFour({
               <h3 className="text-sm sm:text-base font-medium text-gray-900">
                 Coste:
               </h3>
-              <p className="mt-1 text-sm sm:text-base text-gray-600">
-                {cost === "low"
-                  ? "Económico"
-                  : cost === "medium"
-                    ? "Moderado"
-                    : "Premium"}
-              </p>
+              <p className="mt-1 text-sm sm:text-base text-gray-600">{cost}</p>
             </div>
 
             <div>

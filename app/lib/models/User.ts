@@ -1,4 +1,5 @@
-import mongoose, { Document, Schema } from "mongoose";
+import { Document, Schema, models, model } from "mongoose";
+
 export interface IUser extends Document {
   name?: string;
   email: string;
@@ -53,6 +54,7 @@ const userSchema = new Schema<IUser>(
   { timestamps: true }
 );
 
-const User = mongoose.model<IUser>("User", userSchema);
+// Evitar la recompilación del modelo si ya existe
+const User = models.User || model<IUser>("User", userSchema);
 
 export default User;

@@ -135,22 +135,12 @@ export default function Home() {
     }
   };
 
-  const handleFavoriteToggle = async (updatedRecipe: IRecipe) => {
-    try {
-      setError(null);
-      const updated = await recipeApi.toggleFavorite(
-        updatedRecipe._id!,
-        !updatedRecipe.isFavorite
-      );
-      setRecipes((prevRecipes) =>
-        prevRecipes.map((recipe) =>
-          recipe._id === updated._id ? updated : recipe
-        )
-      );
-    } catch (error) {
-      console.error("Error al actualizar favorito:", error);
-      setError(getErrorMessage(error));
-    }
+  const handleFavoriteToggle = (updatedRecipe: IRecipe) => {
+    setRecipes(
+      recipes.map((recipe) =>
+        recipe._id === updatedRecipe._id ? updatedRecipe : recipe
+      )
+    );
   };
 
   const filteredRecipes = useMemo(() => {
@@ -178,7 +168,7 @@ export default function Home() {
         break;
       }
       case "difficulty": {
-        const difficultyOrder = { basic: 0, intermediate: 1, advanced: 2 };
+        const difficultyOrder = { Fácil: 0, Media: 1, Difícil: 2 };
         sorted.sort(
           (a, b) =>
             difficultyOrder[a.difficulty as keyof typeof difficultyOrder] -
