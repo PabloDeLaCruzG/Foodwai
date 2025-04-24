@@ -102,12 +102,11 @@ export default function Home() {
     try {
       await fetchGenerationsStatus(); // nos aseguramos de tener datos actualizados
 
-      const totalCredits = dailyGenerationCount + rewardedGenerations;
-      if (totalCredits > 0) {
-        // Sí hay créditos
+      if (dailyGenerationCount > 0) {
+        // Si tiene generaciones diarias disponibles, abrimos el wizard
         setShowWizard(true);
       } else {
-        // No hay créditos
+        // No hay generaciones diarias disponibles, mostramos el anuncio
         setShowAdModal(true);
       }
     } catch (error) {
@@ -294,7 +293,7 @@ export default function Home() {
 
           {/* Anuncio después del grid de recetas */}
           <div className="mt-8 flex justify-center">
-            <AdSenseDisplay slot="5678901234" />
+            <AdSenseDisplay slot="5678901234" showError={false} />
           </div>
         </div>
       </div>

@@ -1,15 +1,14 @@
 "use client";
 import React, { useState } from "react";
-import { PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
-import ErrorMessage from "../ErrorMessage";
+import { XMarkIcon } from "@heroicons/react/24/solid";
 
 interface StepTwoProps {
   ingredientsToInclude: string[];
-  setIngredientsToInclude: (ingredients: string[]) => void;
+  setIngredientsToInclude: React.Dispatch<React.SetStateAction<string[]>>;
   ingredientsToExclude: string[];
-  setIngredientsToExclude: (ingredients: string[]) => void;
+  setIngredientsToExclude: React.Dispatch<React.SetStateAction<string[]>>;
   extraAllergens: string;
-  setExtraAllergens: (allergens: string) => void;
+  setExtraAllergens: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export default function StepTwo({
@@ -20,204 +19,149 @@ export default function StepTwo({
   extraAllergens,
   setExtraAllergens,
 }: StepTwoProps) {
-  const [includeInput, setIncludeInput] = useState("");
-  const [excludeInput, setExcludeInput] = useState("");
-  const [error, setError] = useState<string | null>(null);
+  const [newIngredient, setNewIngredient] = useState("");
+  const [newExcludedIngredient, setNewExcludedIngredient] = useState("");
 
-  const validateIngredient = (ingredient: string) => {
-    if (!ingredient.trim()) {
-      throw new Error("El ingrediente no puede estar vacío");
-    }
-    if (ingredient.length < 2) {
-      throw new Error("El ingrediente debe tener al menos 2 caracteres");
-    }
-    if (ingredient.length > 50) {
-      throw new Error("El ingrediente no puede tener más de 50 caracteres");
-    }
-    if (!/^[a-zA-ZáéíóúñÁÉÍÓÚÑ\s]+$/.test(ingredient)) {
-      throw new Error("El ingrediente solo puede contener letras y espacios");
+  const handleAddIngredient = () => {
+    if (newIngredient.trim()) {
+      setIngredientsToInclude([...ingredientsToInclude, newIngredient.trim()]);
+      setNewIngredient("");
     }
   };
 
-  const handleAddIngredient = (type: "include" | "exclude") => {
-    try {
-      const ingredient =
-        type === "include" ? includeInput.trim() : excludeInput.trim();
-      validateIngredient(ingredient);
+  const handleRemoveIngredient = (ingredient: string) => {
+    setIngredientsToInclude(
+      ingredientsToInclude.filter((i) => i !== ingredient)
+    );
+  };
 
-      if (type === "include") {
-        if (ingredientsToInclude.includes(ingredient)) {
-          throw new Error("Este ingrediente ya está en la lista de inclusión");
-        }
-        if (ingredientsToInclude.length >= 10) {
-          throw new Error(
-            "No puedes agregar más de 10 ingredientes para incluir"
-          );
-        }
-        setIngredientsToInclude([...ingredientsToInclude, ingredient]);
-        setIncludeInput("");
-      } else {
-        if (ingredientsToExclude.includes(ingredient)) {
-          throw new Error("Este ingrediente ya está en la lista de exclusión");
-        }
-        if (ingredientsToExclude.length >= 5) {
-          throw new Error(
-            "No puedes agregar más de 5 ingredientes para excluir"
-          );
-        }
-        setIngredientsToExclude([...ingredientsToExclude, ingredient]);
-        setExcludeInput("");
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-        setError(err.message);
-        setTimeout(() => setError(null), 3000);
-      }
+  const handleAddExcludedIngredient = () => {
+    if (newExcludedIngredient.trim()) {
+      setIngredientsToExclude([
+        ...ingredientsToExclude,
+        newExcludedIngredient.trim(),
+      ]);
+      setNewExcludedIngredient("");
     }
   };
 
-  const handleRemoveIngredient = (
-    ingredient: string,
-    type: "include" | "exclude"
-  ) => {
-    try {
-      if (type === "include") {
-        setIngredientsToInclude(
-          ingredientsToInclude.filter((i) => i !== ingredient)
-        );
-      } else {
-        setIngredientsToExclude(
-          ingredientsToExclude.filter((i) => i !== ingredient)
-        );
-      }
-    } catch {
-      setError("Error al eliminar el ingrediente");
-      setTimeout(() => setError(null), 3000);
+  const handleRemoveExcludedIngredient = (ingredient: string) => {
+    setIngredientsToExclude(
+      ingredientsToExclude.filter((i) => i !== ingredient)
+    );
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleAddIngredient();
+    }
+  };
+
+  const handleExcludedKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === "Enter") {
+      handleAddExcludedIngredient();
     }
   };
 
   return (
-    <div className="space-y-8">
-      {error && <ErrorMessage message={error} className="animate-slideIn" />}
-
+    <div className="space-y-6">
       <div>
-        <h3 className="text-lg font-semibold mb-2 text-gray-900">
-          Ingredientes que quieres incluir
-          <span className="text-sm font-normal text-gray-500 ml-2">
-            (Máx. 10)
-          </span>
-        </h3>
-        <p className="text-sm text-gray-600 mb-4">
-          ¿Qué ingredientes te gustaría usar en tu receta?
+        <h2 className="text-lg sm:text-xl font-semibold mb-2">
+          Ingredientes principales
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4">
+          ¿Qué ingredientes te gustaría incluir en tu receta?
         </p>
-
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={includeInput}
-            onChange={(e) => setIncludeInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddIngredient("include");
-              }
-            }}
-            placeholder="Ej: tomate"
-            className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-          <button
-            onClick={() => handleAddIngredient("include")}
-            disabled={!includeInput.trim()}
-            className="bg-orange-500 text-white p-2 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <PlusIcon className="w-5 h-5" />
-          </button>
-        </div>
-
         <div className="flex flex-wrap gap-2">
-          {ingredientsToInclude.map((ingredient) => (
+          {ingredientsToInclude.map((ingredient, index) => (
             <span
-              key={ingredient}
-              className="bg-orange-100 text-orange-800 px-3 py-1 rounded-full text-sm flex items-center gap-1"
+              key={index}
+              className="inline-flex items-center gap-1 px-3 py-1 bg-green-100 text-green-700 rounded-full text-sm"
             >
               {ingredient}
               <button
-                onClick={() => handleRemoveIngredient(ingredient, "include")}
-                className="hover:text-orange-600"
+                onClick={() => handleRemoveIngredient(ingredient)}
+                className="hover:text-green-900"
               >
                 <XMarkIcon className="w-4 h-4" />
               </button>
             </span>
           ))}
         </div>
+        <div className="mt-2 flex gap-2">
+          <input
+            type="text"
+            value={newIngredient}
+            onChange={(e) => setNewIngredient(e.target.value)}
+            onKeyPress={handleKeyPress}
+            placeholder="Escribe un ingrediente"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+          <button
+            onClick={handleAddIngredient}
+            disabled={!newIngredient.trim()}
+            className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+          >
+            Añadir
+          </button>
+        </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-2 text-gray-900">
-          Ingredientes que quieres excluir
-          <span className="text-sm font-normal text-gray-500 ml-2">
-            (Máx. 5)
-          </span>
-        </h3>
-        <p className="text-sm text-gray-600 mb-4">
-          ¿Hay algún ingrediente que prefieras evitar?
+        <h2 className="text-lg sm:text-xl font-semibold mb-2">
+          Ingredientes a evitar
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4">
+          ¿Hay algún ingrediente que prefieras no usar?
         </p>
-
-        <div className="flex gap-2 mb-4">
-          <input
-            type="text"
-            value={excludeInput}
-            onChange={(e) => setExcludeInput(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === "Enter") {
-                e.preventDefault();
-                handleAddIngredient("exclude");
-              }
-            }}
-            placeholder="Ej: pimiento"
-            className="flex-1 border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
-          />
-          <button
-            onClick={() => handleAddIngredient("exclude")}
-            disabled={!excludeInput.trim()}
-            className="bg-orange-500 text-white p-2 rounded-lg hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            <PlusIcon className="w-5 h-5" />
-          </button>
-        </div>
-
         <div className="flex flex-wrap gap-2">
-          {ingredientsToExclude.map((ingredient) => (
+          {ingredientsToExclude.map((ingredient, index) => (
             <span
-              key={ingredient}
-              className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm flex items-center gap-1"
+              key={index}
+              className="inline-flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 rounded-full text-sm"
             >
               {ingredient}
               <button
-                onClick={() => handleRemoveIngredient(ingredient, "exclude")}
-                className="hover:text-red-600"
+                onClick={() => handleRemoveExcludedIngredient(ingredient)}
+                className="hover:text-red-900"
               >
                 <XMarkIcon className="w-4 h-4" />
               </button>
             </span>
           ))}
         </div>
+        <div className="mt-2 flex gap-2">
+          <input
+            type="text"
+            value={newExcludedIngredient}
+            onChange={(e) => setNewExcludedIngredient(e.target.value)}
+            onKeyPress={handleExcludedKeyPress}
+            placeholder="Escribe un ingrediente"
+            className="flex-1 px-3 py-2 border border-gray-300 rounded-md text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-orange-500"
+          />
+          <button
+            onClick={handleAddExcludedIngredient}
+            disabled={!newExcludedIngredient.trim()}
+            className="px-4 py-2 bg-orange-500 text-white rounded-md hover:bg-orange-600 transition-colors disabled:opacity-50 disabled:cursor-not-allowed text-sm sm:text-base"
+          >
+            Añadir
+          </button>
+        </div>
       </div>
 
       <div>
-        <h3 className="text-lg font-semibold mb-2 text-gray-900">
-          Alergias o intolerancias adicionales
-        </h3>
+        <h2 className="text-lg sm:text-xl font-semibold mb-2">
+          Alergias adicionales
+        </h2>
+        <p className="text-sm sm:text-base text-gray-600 mb-4">
+          Menciona cualquier otra alergia o ingrediente a evitar
+        </p>
         <textarea
           value={extraAllergens}
           onChange={(e) => setExtraAllergens(e.target.value)}
-          placeholder="Describe cualquier alergia o intolerancia adicional..."
-          className="w-full border rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500 h-24 resize-none"
-          maxLength={200}
+          placeholder="Ej: Soy alérgico al kiwi y a los mariscos"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm sm:text-base focus:outline-none focus:ring-2 focus:ring-orange-500 min-h-[100px]"
         />
-        <p className="text-sm text-gray-500 mt-1">
-          {extraAllergens.length}/200 caracteres
-        </p>
       </div>
     </div>
   );
