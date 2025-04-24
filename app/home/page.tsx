@@ -168,7 +168,7 @@ export default function Home() {
         break;
       }
       case "difficulty": {
-        const difficultyOrder = { basic: 0, intermediate: 1, advanced: 2 };
+        const difficultyOrder = { Fácil: 0, Media: 1, Difícil: 2 };
         sorted.sort(
           (a, b) =>
             difficultyOrder[a.difficulty as keyof typeof difficultyOrder] -

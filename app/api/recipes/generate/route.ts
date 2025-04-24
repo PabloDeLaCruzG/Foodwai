@@ -77,20 +77,32 @@ export async function POST(req: NextRequest) {
     const excludeStr = ingredientsToExclude?.join(", ") || "none";
 
     const prompt = `
-      Genera una receta que cumpla con los siguientes parámetros:
-      Tipos de cocina: ${cuisinesStr}
-      Restricciones dietéticas: ${dietStr}
-      Alérgenos adicionales: ${extraAllergens || "ninguno"}
-      Ingredientes a incluir: ${includeStr}
-      Ingredientes a excluir: ${excludeStr}
-      Preferencia de tiempo de preparación: ${time}
-      Nivel de dificultad: ${difficulty}
-      Nivel de coste: ${cost}
-      Raciones: ${servings}
-      Propósito: ${purpose || "general"}
-      Detalles extra: ${extraDetails || "ninguno"}
-    
-      Devuelve un JSON ESTRICTAMENTE válido con la siguiente estructura:
+      Eres un chef experto especializado en crear recetas detalladas y precisas. Genera una receta que cumpla ESTRICTAMENTE con estos requisitos:
+
+      REQUISITOS PRINCIPALES:
+      - Tipos de cocina: ${cuisinesStr}
+      - Restricciones dietéticas: ${dietStr}
+      - Alérgenos a evitar: ${extraAllergens || "ninguno"}
+      - Ingredientes obligatorios: ${includeStr}
+      - Ingredientes prohibidos: ${excludeStr}
+      - Tiempo máximo de preparación: ${time}
+      - Nivel de dificultad: ${difficulty}
+      - Nivel de coste: ${cost}
+      - Número de raciones: ${servings}
+      - Propósito/ocasión: ${purpose || "general"}
+      - Consideraciones adicionales: ${extraDetails || "ninguna"}
+
+      REGLAS OBLIGATORIAS:
+      1. La receta debe ser realista y ejecutable
+      2. Los ingredientes deben tener cantidades y unidades precisas
+      3. Los pasos deben ser claros y estar en orden lógico
+      4. Las cantidades nutricionales deben ser realistas
+      5. El tiempo de preparación debe ajustarse al requisito especificado
+      6. Los ingredientes prohibidos NO deben aparecer en la receta
+      7. Las restricciones dietéticas deben respetarse ESTRICTAMENTE
+      8. Si la cantidad es al gusto, especifica quantity 1 y unit "al gusto"
+
+      EJEMPLO DE FORMATO JSON REQUERIDO:
       {
         "title": "string",
         "description": "string",
