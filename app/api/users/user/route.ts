@@ -4,8 +4,6 @@ import { connectDB } from "@/app/lib/db";
 import User from "@/app/lib/models/User";
 import jwt from "jsonwebtoken";
 
-const JWT_SECRET = process.env.JWT_SECRET || "secret";
-
 export async function GET() {
   try {
     await connectDB();
@@ -19,12 +17,16 @@ export async function GET() {
       );
     }
 
-    const decoded = jwt.verify(token, JWT_SECRET) as { id: string };
-    const user = await User.findById(decoded.id);
+    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      id: string;
+    };
+    const userId = decoded.id;
+
+    const user = await User.findById(userId);
     if (!user) {
       return NextResponse.json(
         { message: "Usuario no encontrado" },
-        { status: 404 }
+        { status: 401 }
       );
     }
 

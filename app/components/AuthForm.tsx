@@ -3,9 +3,10 @@
 import { useState } from "react";
 import { authApi } from "../lib/data";
 import { useRouter } from "next/navigation";
-import axios from "axios";
 import { GoogleLogin } from "@react-oauth/google";
 import { FaSpinner } from "react-icons/fa";
+import { getErrorMessage } from "../lib/utils/errorUtils";
+import ErrorMessage from "./ErrorMessage";
 
 export default function AuthForm() {
   const [mode, setMode] = useState<"login" | "register">("login");
@@ -15,21 +16,64 @@ export default function AuthForm() {
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
+  const validatePassword = (
+    pass: string
+  ): { isValid: boolean; message: string } => {
+    if (pass.length < 8) {
+      return {
+        isValid: false,
+        message: "La contraseña debe tener al menos 8 caracteres",
+      };
+    }
+    if (!/[A-Z]/.test(pass)) {
+      return {
+        isValid: false,
+        message: "La contraseña debe contener al menos una mayúscula",
+      };
+    }
+    if (!/[a-z]/.test(pass)) {
+      return {
+        isValid: false,
+        message: "La contraseña debe contener al menos una minúscula",
+      };
+    }
+    if (!/[0-9]/.test(pass)) {
+      return {
+        isValid: false,
+        message: "La contraseña debe contener al menos un número",
+      };
+    }
+    return { isValid: true, message: "" };
+  };
+
   const router = useRouter();
 
   const handleGoogleAuth = async (idToken: string) => {
     setLoading(true);
+    setErrorMsg(null);
     try {
       await authApi.googleAuth(idToken);
       router.push("/home");
     } catch (error) {
       console.error("Error en autenticación con Google", error);
+      setErrorMsg(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
   };
 
   const checkEmail = async () => {
+    if (!email) {
+      setErrorMsg("Por favor, ingresa tu correo electrónico");
+      return;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setErrorMsg("Por favor, ingresa un correo electrónico válido");
+      return;
+    }
+
     setErrorMsg(null);
     setLoading(true);
     try {
@@ -49,13 +93,8 @@ export default function AuthForm() {
       }
       setStep("password");
     } catch (error) {
-      if (axios.isAxiosError(error) && error.response?.status === 404) {
-        setMode("register");
-        setStep("password");
-      } else {
-        console.error("Error verificando el email:", error);
-        setErrorMsg("Error verificando el email.");
-      }
+      console.error("Error verificando el email:", error);
+      setErrorMsg(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -64,6 +103,20 @@ export default function AuthForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMsg(null);
+
+    if (!email || !password) {
+      setErrorMsg("Por favor, completa todos los campos");
+      return;
+    }
+
+    if (mode === "register") {
+      const { isValid, message } = validatePassword(password);
+      if (!isValid) {
+        setErrorMsg(message);
+        return;
+      }
+    }
+
     setLoading(true);
 
     try {
@@ -74,14 +127,11 @@ export default function AuthForm() {
       }
       router.push("/home");
     } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMsg =
-          (error.response?.data as { message?: string })?.message ||
-          "Error en la autenticación.";
-        setErrorMsg(errorMsg);
-      } else if (error instanceof Error) {
-        setErrorMsg(error.message);
-      }
+      console.error(
+        mode === "login" ? "Error en login:" : "Error en registro:",
+        error
+      );
+      setErrorMsg(getErrorMessage(error));
     } finally {
       setLoading(false);
     }
@@ -117,6 +167,13 @@ export default function AuthForm() {
         <span className="px-2 text-gray-500">OR</span>
         <hr className="w-full border-gray-300" />
       </div>
+
+      {errorMsg && (
+        <ErrorMessage
+          message={errorMsg}
+          className="w-full mb-4 animate-slideIn"
+        />
+      )}
 
       <form onSubmit={handleSubmit} className="w-full">
         <label htmlFor="email" className="block text-gray-600 text-sm mb-1">

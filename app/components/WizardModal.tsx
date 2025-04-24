@@ -14,6 +14,9 @@ import StepFour from "./steps/StepFour";
 import StepIndicator from "./steps/StepIndicator";
 import { recipeApi } from "../lib/data";
 import { GenerateRecipeBody } from "../lib/interfaces";
+import { getErrorMessage, ERROR_MESSAGES } from "../lib/utils/errorUtils";
+import ErrorMessage from "./ErrorMessage";
+import { AxiosError } from "axios";
 
 interface WizardModalProps {
   onClose: () => void;
@@ -58,7 +61,8 @@ export default function WizardModal({ onClose }: WizardModalProps) {
 
   const goNext = () => {
     if (!isStepValid()) {
-      return; // No avanzar si el paso actual no es válido
+      setErrorMessage(ERROR_MESSAGES.VALIDATION_ERROR);
+      return;
     }
     setCurrentStep((prev) => {
       const next = prev + 1;
@@ -81,6 +85,7 @@ export default function WizardModal({ onClose }: WizardModalProps) {
 
   const handleGenerateRecipe = async () => {
     if (!isStepValid()) {
+      setErrorMessage(ERROR_MESSAGES.VALIDATION_ERROR);
       return;
     }
     setIsLoading(true);
@@ -98,7 +103,7 @@ export default function WizardModal({ onClose }: WizardModalProps) {
       servings,
       purpose,
       extraDetails,
-      useGemini: true, // Activando el uso de Gemini
+      useGemini: true,
     };
 
     console.log("userPreferences", userPreferences);
@@ -122,9 +127,11 @@ export default function WizardModal({ onClose }: WizardModalProps) {
       }, 1500);
     } catch (error) {
       console.error("Error al generar la receta:", error);
-      setErrorMessage(
-        "Hubo un error al generar la receta. Por favor, inténtalo de nuevo."
-      );
+      if (error instanceof AxiosError && error.response?.status === 403) {
+        setErrorMessage(ERROR_MESSAGES.NO_CREDITS);
+      } else {
+        setErrorMessage(getErrorMessage(error));
+      }
     } finally {
       setIsLoading(false);
     }
@@ -303,10 +310,18 @@ export default function WizardModal({ onClose }: WizardModalProps) {
           </div>
         )}
 
-        {/* Mensaje de error */}
+        {/* Mensaje de error mejorado */}
         {errorMessage && (
-          <div className="fixed bottom-4 right-4 bg-red-500 text-white px-6 py-3 rounded-lg shadow-lg z-50 animate-slideIn">
-            {errorMessage}
+          <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md">
+            <ErrorMessage
+              message={errorMessage}
+              onRetry={
+                errorMessage === ERROR_MESSAGES.NO_CREDITS
+                  ? undefined
+                  : handleGenerateRecipe
+              }
+              className="animate-slideIn shadow-lg"
+            />
           </div>
         )}
 

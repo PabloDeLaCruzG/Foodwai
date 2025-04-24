@@ -14,6 +14,8 @@ import FilterTabs from "../components/filters/FilterTabs";
 import SearchBar from "../components/filters/SearchBar";
 import SortBy from "../components/filters/SortBy";
 import AdSenseDisplay from "../components/AdSenseDisplay";
+import { getErrorMessage, ERROR_MESSAGES } from "../lib/utils/errorUtils";
+import ErrorMessage from "../components/ErrorMessage";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<IRecipe[]>([]);
@@ -35,6 +37,13 @@ export default function Home() {
 
   const { user } = useAuth();
 
+  const handleRetry = () => {
+    setError(null);
+    setIsLoading(true);
+    fetchRecipes();
+    fetchGenerationsStatus();
+  };
+
   const fetchRecipes = useCallback(() => {
     if (user && user._id) {
       setIsLoading(true);
@@ -46,13 +55,13 @@ export default function Home() {
             setRecipes(recipes);
           } else {
             console.error("La respuesta de la API no es un array:", recipes);
-            setError("Error al cargar las recetas");
+            setError(ERROR_MESSAGES.SERVER_ERROR);
             setRecipes([]);
           }
         })
         .catch((error) => {
           console.error("Error al obtener recetas:", error);
-          setError("Error al cargar las recetas. Por favor, intenta de nuevo.");
+          setError(getErrorMessage(error));
           setRecipes([]);
         })
         .finally(() => {
@@ -65,12 +74,12 @@ export default function Home() {
     userApi
       .getDailyStatus()
       .then((data) => {
-        // data = { dailyGenerationCount, rewardedGenerations, totalDisponibles... }
         setDailyGenerationCount(data.dailyGenerationCount);
         setRewardedGenerations(data.rewardedGenerations);
       })
       .catch((error) => {
         console.error("Error al obtener estado diario:", error);
+        setError(getErrorMessage(error));
       });
   }, []);
 
@@ -93,16 +102,16 @@ export default function Home() {
     try {
       await fetchGenerationsStatus(); // nos aseguramos de tener datos actualizados
 
-      const totalCredits = dailyGenerationCount + rewardedGenerations;
-      if (totalCredits > 0) {
-        // Sí hay créditos
+      if (dailyGenerationCount > 0) {
+        // Si tiene generaciones diarias disponibles, abrimos el wizard
         setShowWizard(true);
       } else {
-        // No hay créditos
+        // No hay generaciones diarias disponibles, mostramos el anuncio
         setShowAdModal(true);
       }
     } catch (error) {
       console.error("Error checking credits:", error);
+      setError(getErrorMessage(error));
     }
   };
 
@@ -115,21 +124,33 @@ export default function Home() {
   // => Llamamos al backend, sumamos +1, refrescamos estado y abrimos wizard
   const handleWatchAd = async () => {
     try {
+      setError(null);
       await userApi.watchAdReward(); // esto da +1
       await fetchGenerationsStatus(); // recargamos para ver la nueva cifra de créditos
       setShowAdModal(false); // cerramos modal de anuncio
       setShowWizard(true); // ahora sí abrimos wizard
     } catch (error) {
       console.error("Error al otorgar recompensa:", error);
+      setError(getErrorMessage(error));
     }
   };
 
-  const handleFavoriteToggle = (updatedRecipe: IRecipe) => {
-    setRecipes(
-      recipes.map((recipe) =>
-        recipe._id === updatedRecipe._id ? updatedRecipe : recipe
-      )
-    );
+  const handleFavoriteToggle = async (updatedRecipe: IRecipe) => {
+    try {
+      setError(null);
+      const updated = await recipeApi.toggleFavorite(
+        updatedRecipe._id!,
+        !updatedRecipe.isFavorite
+      );
+      setRecipes((prevRecipes) =>
+        prevRecipes.map((recipe) =>
+          recipe._id === updated._id ? updated : recipe
+        )
+      );
+    } catch (error) {
+      console.error("Error al actualizar favorito:", error);
+      setError(getErrorMessage(error));
+    }
   };
 
   const filteredRecipes = useMemo(() => {
@@ -179,66 +200,58 @@ export default function Home() {
   }, [filteredRecipes, sortBy]);
 
   return (
-    <main className="h-[calc(100vh-64px)] flex">
-      {/* <aside className="hidden lg:block w-64 p-4 py-6 custom-scrollbar">
-        <AsideSection onRecipeSave={fetchRecipes} />
-      </aside> */}
-      <div className="flex-1 overflow-y-auto p-4 custom-scrollbar">
-        <div className="max-w-7xl mx-auto">
-          {/* Barra de filtros */}
-          <div className="mb-6 border-b border-gray-100 pb-4 pt-2">
-            <div className="flex items-center justify-between gap-2 min-w-0">
-              {/* Ordenación - Izquierda */}
-              <div className="shrink-0">
-                <SortBy sortBy={sortBy} setSortBy={setSortBy} />
-              </div>
+    <main className="min-h-screen bg-gray-50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div className="space-y-8">
+          {/* Header y controles */}
+          <div className="flex flex-col gap-6">
+            <div className="mb-6 border-b border-gray-100 pb-4 pt-2">
+              <div className="flex items-center justify-between gap-2 min-w-0">
+                {/* Ordenación - Izquierda */}
+                <div className="shrink-0">
+                  <SortBy sortBy={sortBy} setSortBy={setSortBy} />
+                </div>
 
-              {/* Filtros Todas/Favoritas - Centro */}
-              <div className="flex-1 flex justify-center min-w-0">
-                <FilterTabs
-                  filterType={filterType}
-                  setFilterType={setFilterType}
-                />
-              </div>
+                {/* Filtros Todas/Favoritas - Centro */}
+                <div className="flex-1 flex justify-center min-w-0">
+                  <FilterTabs
+                    filterType={filterType}
+                    setFilterType={setFilterType}
+                  />
+                </div>
 
-              {/* Buscador - Derecha */}
-              <div className="shrink-0">
-                <SearchBar
-                  searchTerm={searchTerm}
-                  setSearchTerm={setSearchTerm}
-                />
+                {/* Buscador - Derecha */}
+                <div className="shrink-0">
+                  <SearchBar
+                    searchTerm={searchTerm}
+                    setSearchTerm={setSearchTerm}
+                  />
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Grid de recetas */}
-          {isLoading ? (
+          {/* Contenido principal */}
+          {error ? (
+            <div className="flex flex-col items-center justify-center min-h-[400px] px-4">
+              <ErrorMessage
+                message={error}
+                onRetry={handleRetry}
+                className="max-w-md mx-auto"
+              />
+            </div>
+          ) : isLoading ? (
             <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {[...Array(8)].map((_, i) => (
-                <div key={i} className="animate-pulse">
-                  <div className="bg-gray-200 aspect-square rounded-lg mb-4"></div>
-                  <div className="space-y-3">
-                    <div className="h-4 bg-gray-200 rounded w-3/4"></div>
-                    <div className="h-4 bg-gray-200 rounded"></div>
-                    <div className="h-4 bg-gray-200 rounded w-1/2"></div>
-                  </div>
+                <div
+                  key={i}
+                  className="bg-white rounded-lg shadow-md p-4 animate-pulse"
+                >
+                  <div className="w-full h-48 bg-gray-200 rounded-lg mb-4" />
+                  <div className="h-4 bg-gray-200 rounded w-3/4 mb-2" />
+                  <div className="h-4 bg-gray-200 rounded w-1/2" />
                 </div>
               ))}
-            </div>
-          ) : error ? (
-            <div className="flex flex-col items-center justify-center min-h-[400px] px-4 gap-4">
-              <h2 className="text-xl sm:text-2xl font-semibold text-center">
-                Error
-              </h2>
-              <p className="text-gray-600 text-center max-w-md text-sm sm:text-base">
-                {error}
-              </p>
-              <button
-                onClick={fetchRecipes}
-                className="flex items-center gap-2 bg-orange-500 text-white px-4 py-2 rounded-md hover:bg-orange-600 transition-colors"
-              >
-                Reintentar
-              </button>
             </div>
           ) : sortedAndFilteredRecipes.length === 0 ? (
             <div className="flex flex-col items-center justify-center min-h-[400px] px-4 gap-4">
@@ -280,28 +293,39 @@ export default function Home() {
 
           {/* Anuncio después del grid de recetas */}
           <div className="mt-8 flex justify-center">
-            <AdSenseDisplay slot="5678901234" />
+            <AdSenseDisplay slot="5678901234" showError={false} />
           </div>
-
-          {/* Botón flotante */}
-          <button
-            className="fixed bottom-8 right-6 bg-orange-500 text-white p-4 rounded-full shadow-lg hover:bg-orange-600 transition-colors"
-            onClick={handleFloatingButtonClick}
-          >
-            <Image
-              src={`/${imageNumber}off.webp`}
-              alt="Wizard"
-              width={40}
-              height={40}
-            />
-          </button>
-
-          {showWizard && <WizardModal onClose={closeWizard} />}
-          {showAdModal && (
-            <AdModal onClose={closeAdModal} onWatchAd={handleWatchAd} />
-          )}
         </div>
       </div>
+
+      {/* Botón flotante */}
+      <button
+        className="fixed bottom-8 right-6 bg-orange-500 text-white p-4 rounded-full shadow-lg hover:bg-orange-600 transition-colors"
+        onClick={handleFloatingButtonClick}
+      >
+        <Image
+          src={`/${imageNumber}off.webp`}
+          alt="Wizard"
+          width={40}
+          height={40}
+        />
+      </button>
+
+      {showWizard && <WizardModal onClose={closeWizard} />}
+      {showAdModal && (
+        <AdModal onClose={closeAdModal} onWatchAd={handleWatchAd} />
+      )}
+
+      {/* Mensajes de error globales */}
+      {error && (
+        <div className="fixed bottom-4 left-1/2 transform -translate-x-1/2 w-full max-w-md">
+          <ErrorMessage
+            message={error}
+            onRetry={handleRetry}
+            className="animate-slideIn shadow-lg"
+          />
+        </div>
+      )}
     </main>
   );
 }

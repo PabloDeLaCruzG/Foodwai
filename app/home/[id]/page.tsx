@@ -17,6 +17,8 @@ import { IRecipe } from "../../lib/interfaces"; // Ajusta la ruta según tu proy
 import { recipeApi } from "../../lib/data"; // Ajusta según tu API
 import SquareBar from "@/app/components/SquareBar";
 import AdSenseDisplay from "@/app/components/AdSenseDisplay";
+import { getErrorMessage, ERROR_MESSAGES } from "@/app/lib/utils/errorUtils";
+import ErrorMessage from "@/app/components/ErrorMessage";
 
 // Rango de ejemplo para calcular las barras (o cuadrados) de nutrientes
 const NUTRIENT_RANGES = {
@@ -38,6 +40,8 @@ function getFilledSquares(
 export default function RecipeDetailsPage() {
   const { id }: { id: IRecipe["_id"] } = useParams();
   const [recipe, setRecipe] = useState<IRecipe | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   // Traer la receta del API
   useEffect(() => {
@@ -47,6 +51,7 @@ export default function RecipeDetailsPage() {
       try {
         const data = await recipeApi.getRecipeById(id!);
         setRecipe(data);
+        setError(null);
 
         // Detener el polling si:
         // 1. La imagen está lista
@@ -59,9 +64,12 @@ export default function RecipeDetailsPage() {
         ) {
           clearInterval(intervalId);
         }
-      } catch (error: unknown) {
-        console.error("Error fetching recipe:", error as Error);
+      } catch (err) {
+        console.error("Error fetching recipe:", err);
+        setError(getErrorMessage(err));
         clearInterval(intervalId); // También detenemos el polling si hay un error en la petición
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -87,6 +95,7 @@ export default function RecipeDetailsPage() {
     if (!recipe?._id) return;
 
     try {
+      setError(null);
       await recipeApi.generateImageForRecipe(recipe._id);
       // Reiniciar el polling
       setRecipe((prev) =>
@@ -98,15 +107,51 @@ export default function RecipeDetailsPage() {
             }
           : null
       );
-    } catch (error) {
-      console.error("Error al reintentar la generación de imagen:", error);
+    } catch (err) {
+      console.error("Error al reintentar la generación de imagen:", err);
+      setError(getErrorMessage(err));
     }
   };
 
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="animate-spin inline-block w-12 h-12 border-4 border-current border-t-transparent text-orange-500 rounded-full" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-gray-50 p-6 flex flex-col items-center justify-center">
+        <ErrorMessage
+          message={error}
+          onRetry={() => window.location.reload()}
+          className="max-w-md mx-auto"
+        />
+        <Link
+          href="/home"
+          className="mt-4 text-orange-500 hover:text-orange-600 transition-colors"
+        >
+          Volver al inicio
+        </Link>
+      </div>
+    );
+  }
+
   if (!recipe) {
     return (
-      <div className="text-black p-4">
-        <p>Cargando la receta...</p>
+      <div className="min-h-screen bg-gray-50 p-6 flex flex-col items-center justify-center">
+        <ErrorMessage
+          message={ERROR_MESSAGES.RECIPE_NOT_FOUND}
+          className="max-w-md mx-auto"
+        />
+        <Link
+          href="/home"
+          className="mt-4 text-orange-500 hover:text-orange-600 transition-colors"
+        >
+          Volver al inicio
+        </Link>
       </div>
     );
   }
