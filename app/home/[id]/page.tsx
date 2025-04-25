@@ -157,7 +157,7 @@ export default function RecipeDetailsPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-[56px] sm:pt-[64px]">
       {/* Hero Section con imagen de fondo */}
       <div className="relative h-[50vh] min-h-[400px] w-full">
         {recipe.imageUrl ? (
@@ -177,7 +177,7 @@ export default function RecipeDetailsPage() {
         )}
 
         {/* Contenido del Hero */}
-        <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 md:p-12 max-w-7xl mx-auto">
+        <div className="absolute inset-0 flex flex-col justify-end p-6 sm:p-8 md:p-12 max-w-7xl mx-auto overflow-y-auto">
           <Link
             href="/home"
             className="inline-flex items-center text-white mb-6 hover:text-orange-200 transition-colors"
@@ -186,10 +186,10 @@ export default function RecipeDetailsPage() {
             <span className="text-sm sm:text-base font-medium">Volver</span>
           </Link>
 
-          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4 leading-tight">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl font-bold text-white mb-4 leading-tight line-clamp-3">
             {recipe.title}
           </h1>
-          <p className="text-lg sm:text-xl text-white/90 max-w-3xl mb-6">
+          <p className="text-lg sm:text-xl text-white/90 max-w-3xl mb-6 line-clamp-3">
             {recipe.description}
           </p>
 

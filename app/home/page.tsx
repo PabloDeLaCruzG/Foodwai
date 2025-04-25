@@ -191,11 +191,11 @@ export default function Home() {
 
   return (
     <main className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
         <div className="space-y-8">
           {/* Header y controles */}
           <div className="flex flex-col gap-6">
-            <div className="mb-6 border-b border-gray-100 pb-4 pt-2">
+            <div className="border-b border-gray-100 pb-4 pt-2">
               <div className="flex items-center justify-between gap-2 min-w-0">
                 {/* Ordenación - Izquierda */}
                 <div className="shrink-0">
@@ -231,7 +231,7 @@ export default function Home() {
               />
             </div>
           ) : isLoading ? (
-            <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6">
               {[...Array(8)].map((_, i) => (
                 <div
                   key={i}
@@ -270,7 +270,7 @@ export default function Home() {
               )}
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 pt-4">
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mt-3 sm:pt-2">
               {sortedAndFilteredRecipes.map((recipe) => (
                 <RecipeCard
                   key={recipe._id}
