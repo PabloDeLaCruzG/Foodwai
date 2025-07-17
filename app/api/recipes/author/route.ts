@@ -4,6 +4,22 @@ import Recipe from "@/app/lib/models/Recipe";
 import User from "@/app/lib/models/User";
 import jwt from "jsonwebtoken";
 
+/**
+ * @openapi
+ * /api/recipes/author:
+ *   get:
+ *     summary: Obtiene las recetas del usuario autenticado
+ *     tags:
+ *       - Recetas
+ *     responses:
+ *       200:
+ *         description: Recetas del usuario obtenidas correctamente
+ *       401:
+ *         description: Token no proporcionado o usuario no autenticado
+ *       404:
+ *         description: Usuario no encontrado
+ */
+
 export async function GET(req: NextRequest) {
   try {
     await connectDB();

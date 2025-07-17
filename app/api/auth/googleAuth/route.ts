@@ -4,6 +4,32 @@ import jwt from "jsonwebtoken";
 import { connectDB } from "@/app/lib/db";
 import User from "@/app/lib/models/User";
 
+/**
+ * @openapi
+ * /api/auth/googleAuth:
+ *   post:
+ *     summary: Inicia sesión o registra usuario con Google
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               idToken:
+ *                 type: string
+ *                 description: Token de Google
+ *     responses:
+ *       200:
+ *         description: Sesión iniciada o usuario registrado correctamente
+ *       400:
+ *         description: Token de Google no recibido
+ *       401:
+ *         description: Token inválido
+ */
+
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";

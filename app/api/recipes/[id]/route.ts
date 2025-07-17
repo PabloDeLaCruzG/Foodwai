@@ -4,6 +4,87 @@ import Recipe from "@/app/lib/models/Recipe";
 import mongoose from "mongoose";
 import jwt from "jsonwebtoken";
 
+/**
+ * @openapi
+ * /api/recipes/{id}:
+ *   get:
+ *     summary: Obtiene una receta por su ID
+ *     tags:
+ *       - Recetas
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la receta
+ *     responses:
+ *       200:
+ *         description: Receta encontrada
+ *       400:
+ *         description: ID inválido
+ *       404:
+ *         description: Receta no encontrada
+ *   delete:
+ *     summary: Elimina una receta por su ID (requiere autenticación)
+ *     tags:
+ *       - Recetas
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la receta
+ *       - in: header
+ *         name: x-user-id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID del usuario autenticado
+ *     responses:
+ *       200:
+ *         description: Receta eliminada correctamente
+ *       400:
+ *         description: ID inválido o receta sin autor
+ *       401:
+ *         description: Usuario no autenticado
+ *       403:
+ *         description: Sin permiso para eliminar
+ *       404:
+ *         description: Receta no encontrada
+ *   put:
+ *     summary: Actualiza una receta por su ID (requiere autenticación)
+ *     tags:
+ *       - Recetas
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         schema:
+ *           type: string
+ *         description: ID de la receta
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               title:
+ *                 type: string
+ *               ...
+ *     responses:
+ *       200:
+ *         description: Receta actualizada correctamente
+ *       400:
+ *         description: Token no proporcionado o datos inválidos
+ *       401:
+ *         description: Usuario no autenticado
+ *       404:
+ *         description: Receta no encontrada
+ */
+
 export async function GET(req: NextRequest) {
   try {
     await connectDB();

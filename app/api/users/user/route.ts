@@ -4,6 +4,22 @@ import { connectDB } from "@/app/lib/db";
 import User from "@/app/lib/models/User";
 import jwt from "jsonwebtoken";
 
+/**
+ * @openapi
+ * /api/users/user:
+ *   get:
+ *     summary: Obtiene la información del usuario autenticado
+ *     tags:
+ *       - Usuarios
+ *     responses:
+ *       200:
+ *         description: Información del usuario obtenida correctamente
+ *       401:
+ *         description: Token no encontrado o usuario no autenticado
+ *       404:
+ *         description: Usuario no encontrado
+ */
+
 export async function GET() {
   try {
     await connectDB();

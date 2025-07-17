@@ -4,6 +4,35 @@ import User from "@/app/lib/models/User";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
+/**
+ * @openapi
+ * /api/auth/login:
+ *   post:
+ *     summary: Inicia sesión de usuario
+ *     tags:
+ *       - Autenticación
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *                 example: usuario@ejemplo.com
+ *               password:
+ *                 type: string
+ *                 example: Contraseña123
+ *     responses:
+ *       200:
+ *         description: Sesión iniciada correctamente
+ *       400:
+ *         description: Email y contraseña requeridos
+ *       401:
+ *         description: Usuario o contraseña incorrectos
+ */
+
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 

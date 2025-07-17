@@ -6,6 +6,34 @@ import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
 import jwt from "jsonwebtoken";
 import mongoose from "mongoose";
 
+/**
+ * @openapi
+ * /api/recipes/generate-image-now:
+ *   post:
+ *     summary: Genera una imagen para una receta existente
+ *     tags:
+ *       - Recetas
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               recipeId:
+ *                 type: string
+ *                 description: ID de la receta
+ *     responses:
+ *       200:
+ *         description: Imagen generada correctamente
+ *       400:
+ *         description: Token no proporcionado o ID inválido
+ *       401:
+ *         description: Usuario no autenticado
+ *       404:
+ *         description: Receta o usuario no encontrado
+ */
+
 export async function POST(req: NextRequest) {
   try {
     console.log("🟢 [generate-image-now] Inicio de ejecución");

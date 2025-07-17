@@ -5,6 +5,22 @@ import User from "@/app/lib/models/User";
 import jwt from "jsonwebtoken";
 import { resetDailyUsage } from "@/app/lib/utils/userUtils";
 
+/**
+ * @openapi
+ * /api/users/watchAdReward:
+ *   post:
+ *     summary: Otorga recompensa diaria al usuario por ver un anuncio
+ *     tags:
+ *       - Usuarios
+ *     responses:
+ *       200:
+ *         description: Recompensa otorgada correctamente
+ *       401:
+ *         description: Token no encontrado o usuario no autenticado
+ *       404:
+ *         description: Usuario no encontrado
+ */
+
 const JWT_SECRET = process.env.JWT_SECRET || "secret";
 
 export async function POST() {

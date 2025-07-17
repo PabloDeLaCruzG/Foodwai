@@ -2,6 +2,20 @@ import { NextResponse } from "next/server";
 import { connectDB } from "@/app/lib/db";
 import Recipe from "@/app/lib/models/Recipe";
 
+/**
+ * @openapi
+ * /api/recipes:
+ *   get:
+ *     summary: Lista todas las recetas
+ *     tags:
+ *       - Recetas
+ *     responses:
+ *       200:
+ *         description: Listado de recetas obtenido correctamente
+ *       500:
+ *         description: Error al obtener recetas
+ */
+
 export async function GET() {
   try {
     console.log("🔄 Iniciando GET /api/recipes");
@@ -10,25 +24,25 @@ export async function GET() {
       mongoUrl: process.env.MONGODB_URL?.substring(0, 20) + "...", // Solo mostramos el inicio por seguridad
       hasOpenAI: !!process.env.OPENAI_API_KEY,
     });
-    
+
     await connectDB();
     console.log("✅ Conexión a DB establecida");
-    
+
     const recipes = await Recipe.find().sort({ updatedAt: -1 });
     console.log(`✅ Recetas recuperadas: ${recipes.length}`);
-    
+
     return NextResponse.json(recipes, { status: 200 });
   } catch (error) {
     console.error("❌ Error detallado en /api/recipes:", {
-      name: error instanceof Error ? error.name : 'Unknown',
-      message: error instanceof Error ? error.message : 'Error desconocido',
-      stack: error instanceof Error ? error.stack : undefined
+      name: error instanceof Error ? error.name : "Unknown",
+      message: error instanceof Error ? error.message : "Error desconocido",
+      stack: error instanceof Error ? error.stack : undefined,
     });
-    
+
     return NextResponse.json(
-      { 
+      {
         message: "Error al obtener recetas",
-        details: error instanceof Error ? error.message : 'Error desconocido'
+        details: error instanceof Error ? error.message : "Error desconocido",
       },
       { status: 500 }
     );

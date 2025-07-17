@@ -10,6 +10,34 @@ const JWT_EXPIRES_IN = process.env.JWT_EXPIRES_IN || "1d";
 const validatePassword = (
   password: string
 ): { isValid: boolean; message: string } => {
+  /**
+   * @openapi
+   * /api/auth/register:
+   *   post:
+   *     summary: Registra un nuevo usuario
+   *     tags:
+   *       - Autenticación
+   *     requestBody:
+   *       required: true
+   *       content:
+   *         application/json:
+   *           schema:
+   *             type: object
+   *             properties:
+   *               email:
+   *                 type: string
+   *                 example: usuario@ejemplo.com
+   *               password:
+   *                 type: string
+   *                 example: Contraseña123
+   *     responses:
+   *       201:
+   *         description: Usuario registrado correctamente
+   *       400:
+   *         description: Email y contraseña requeridos o formato inválido
+   *       409:
+   *         description: El usuario ya existe
+   */
   if (password.length < 8) {
     return {
       isValid: false,

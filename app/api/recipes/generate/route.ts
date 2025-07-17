@@ -6,6 +6,39 @@ import { AIRecipeService } from "@/app/lib/services/aiRecipeService";
 import { resetDailyUsage } from "@/app/lib/utils/userUtils";
 import jwt from "jsonwebtoken";
 
+/**
+ * @openapi
+ * /api/recipes/generate:
+ *   post:
+ *     summary: Genera una receta personalizada usando IA
+ *     tags:
+ *       - Recetas
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               ingredientes:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                 description: Lista de ingredientes
+ *               preferencias:
+ *                 type: string
+ *                 description: Preferencias del usuario
+ *     responses:
+ *       200:
+ *         description: Receta generada correctamente
+ *       400:
+ *         description: Token no proporcionado o datos inválidos
+ *       401:
+ *         description: Usuario no autenticado
+ *       404:
+ *         description: Usuario no encontrado
+ */
+
 export async function POST(req: NextRequest) {
   try {
     console.log("🟢 Iniciando generación de receta");
