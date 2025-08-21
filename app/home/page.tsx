@@ -13,7 +13,6 @@ import AdModal from "../components/AdModal";
 import FilterTabs from "../components/filters/FilterTabs";
 import SearchBar from "../components/filters/SearchBar";
 import SortBy from "../components/filters/SortBy";
-import AdSenseDisplay from "../components/AdSenseDisplay";
 import { getErrorMessage, ERROR_MESSAGES } from "../lib/utils/errorUtils";
 import ErrorMessage from "../components/ErrorMessage";
 
@@ -280,11 +279,6 @@ export default function Home() {
               ))}
             </div>
           )}
-
-          {/* Anuncio después del grid de recetas */}
-          <div className="mt-8 flex justify-center">
-            <AdSenseDisplay slot="5678901234" showError={false} />
-          </div>
         </div>
       </div>
 
