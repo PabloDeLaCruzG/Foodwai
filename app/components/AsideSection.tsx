@@ -7,7 +7,6 @@ import Image from "next/image";
 import { recipeApi } from "@/app/lib/data";
 import { useAuth } from "@/app/context/AuthContext";
 import { IRecipe } from "@/app/lib/interfaces";
-import AdSenseDisplay from "./AdSenseDisplay";
 
 interface IAsideSectionProps {
   onRecipeSave: () => void;
@@ -74,11 +73,6 @@ export default function AsideSection({ onRecipeSave }: IAsideSectionProps) {
             </div>
           ))}
         </Slider>
-      </div>
-
-      {/* Google AdSense block */}
-      <div className="my-4">
-        <AdSenseDisplay slot="7890123456" className="min-h-[250px]" />
       </div>
 
       {/* <div className="mt-8">
