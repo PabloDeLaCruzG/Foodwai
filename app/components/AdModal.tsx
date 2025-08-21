@@ -1,5 +1,6 @@
+
 import { useEffect, useRef, useState } from "react";
-import AdSenseDisplay from "./AdSenseDisplay";
+import AdsterraBanner from "./AdsterraBanner"; // ¡Importamos el nuevo componente!
 
 interface AdModalProps {
   onClose: () => void;
@@ -12,6 +13,7 @@ export default function AdModal({ onClose, onWatchAd }: AdModalProps) {
   const [isAdLoaded, setIsAdLoaded] = useState(false);
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  // Esta lógica es la que tenías originalmente, y ahora vuelve a funcionar.
   useEffect(() => {
     // Solo iniciamos el temporizador cuando el anuncio está cargado
     if (isAdLoaded) {
@@ -49,17 +51,15 @@ export default function AdModal({ onClose, onWatchAd }: AdModalProps) {
           ¡Consigue un token extra!
         </h2>
         <p className="text-sm sm:text-base text-gray-600 mb-4">
-          Mira el anuncio durante <b>{timer}</b> segundos y gana 1 token
-          adicional o espera a mañana para obtener mas ideas.
+          Espera <b>{timer}</b> segundos con el anuncio visible para ganar 1
+          token adicional.
         </p>
-        <div className="flex justify-center items-center mb-4 min-h-[120px]">
-          <AdSenseDisplay
-            slot="4215757779"
-            style={{ display: "block", width: "100%", minHeight: 100 }}
-            onAdLoad={handleAdLoad}
-            showError={true}
-          />
+
+        {/* Aquí es donde mostramos el nuevo anuncio de Adsterra */}
+        <div className="flex justify-center items-center mb-4 min-h-[250px] bg-gray-100 rounded">
+          <AdsterraBanner onAdLoad={handleAdLoad} showError={true} />
         </div>
+
         <button
           onClick={onWatchAd}
           className={`w-full bg-green-500 text-white px-4 py-2 rounded-md hover:bg-green-600 transition-colors text-sm sm:text-base ${
