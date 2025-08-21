@@ -1,10 +1,12 @@
 "use client";
 
+import React from "react";
 import { IRecipe } from "../lib/interfaces";
 import { recipeApi, userApi } from "../lib/data";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import RecipeCard from "../components/RecipeCard";
 import { SparklesIcon } from "@heroicons/react/24/solid";
+import AdsterraNativeBanner from "../components/AdsterraNativeBanner";
 import WizardModal from "../components/WizardModal";
 import { useAuth } from "../context/AuthContext";
 //import AsideSection from "../components/AsideSection";
@@ -15,6 +17,7 @@ import SearchBar from "../components/filters/SearchBar";
 import SortBy from "../components/filters/SortBy";
 import { getErrorMessage, ERROR_MESSAGES } from "../lib/utils/errorUtils";
 import ErrorMessage from "../components/ErrorMessage";
+import AdsterraBanner from "../components/AdsterraBanner";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<IRecipe[]>([]);
@@ -218,6 +221,11 @@ export default function Home() {
                 </div>
               </div>
             </div>
+
+            {/* Anuncio debajo de los filtros */}
+            <div className="bg-white rounded-lg shadow-sm p-4">
+              <AdsterraNativeBanner />
+            </div>
           </div>
 
           {/* Contenido principal */}
@@ -270,13 +278,30 @@ export default function Home() {
             </div>
           ) : (
             <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 lg:gap-6 mt-3 sm:pt-2">
-              {sortedAndFilteredRecipes.map((recipe) => (
-                <RecipeCard
-                  key={recipe._id}
-                  recipe={recipe}
-                  onFavoriteToggle={handleFavoriteToggle}
-                />
-              ))}
+              {sortedAndFilteredRecipes.map((recipe, index) => {
+                // Insertar el banner después de la 4ª receta
+                if (index === 3) {
+                  return (
+                    <React.Fragment key={`group-${recipe._id}`}>
+                      <RecipeCard
+                        key={`recipe-${recipe._id}`}
+                        recipe={recipe}
+                        onFavoriteToggle={handleFavoriteToggle}
+                      />
+                      <div key={`ad-${recipe._id}`} className="col-span-1">
+                        <AdsterraBanner />
+                      </div>
+                    </React.Fragment>
+                  );
+                }
+                return (
+                  <RecipeCard
+                    key={recipe._id}
+                    recipe={recipe}
+                    onFavoriteToggle={handleFavoriteToggle}
+                  />
+                );
+              })}
             </div>
           )}
         </div>

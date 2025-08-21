@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Script from 'next/script';
 import "./globals.css";
 import "slick-carousel/slick/slick.css";
 import "slick-carousel/slick/slick-theme.css";
@@ -38,6 +39,11 @@ export default function RootLayout({
     <html lang="es">
       <head></head>
       <body>{children}</body>
+      {/* Social Bar de Adsterra - Carga diferida */}
+      <Script
+        src="//pl27471490.profitableratecpm.com/80/30/ed/8030ed989b5864652cdfadd3945809ef.js"
+        strategy="lazyOnload"
+      />
     </html>
   );
 }

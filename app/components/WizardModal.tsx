@@ -6,6 +6,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import { useRouter } from "next/navigation";
+import AdsterraNativeBanner from "./AdsterraNativeBanner";
 
 import StepOne from "./steps/StepOne";
 import StepTwo from "./steps/StepTwo";
@@ -287,25 +288,30 @@ export default function WizardModal({ onClose }: WizardModalProps) {
 
         {/* LOADER OVERLAY */}
         {isLoading && (
-          <div className="absolute inset-0 bg-white bg-opacity-90 backdrop-blur-sm z-50 flex flex-col items-center justify-center animate-fadeIn">
+          <div className="absolute inset-0 bg-white bg-opacity-90 backdrop-blur-sm z-50 flex flex-col items-center justify-center gap-8 animate-fadeIn">
             <div className="relative">
               <div className="animate-spin inline-block w-12 h-12 border-4 border-current border-t-transparent text-orange-500 rounded-full" />
               <div className="absolute inset-0 flex items-center justify-center">
                 <SparklesIcon className="w-6 h-6 text-orange-500 animate-pulse" />
               </div>
             </div>
-            <p className="text-gray-700 font-semibold text-center mt-4">
+            <p className="text-gray-700 font-semibold text-center">
               Generando tu receta personalizada...
               <br />
               <span className="text-sm text-gray-500">
                 Estamos creando algo especial para ti
               </span>
             </p>
-            <div className="mt-4 text-sm text-gray-500 max-w-md text-center">
-              <p className="animate-pulse">
+            <div className="text-sm text-gray-500 max-w-md text-center">
+              <p className="animate-pulse mb-4">
                 Esto puede tardar unos segundos mientras nuestra IA crea una
                 receta única
               </p>
+            </div>
+
+            {/* Anuncio de Adsterra durante la carga */}
+            <div className="w-full max-w-md mx-auto px-4">
+              <AdsterraNativeBanner />
             </div>
           </div>
         )}

@@ -16,6 +16,7 @@ import {
 import { IRecipe } from "../../lib/interfaces"; // Ajusta la ruta según tu proyecto
 import { recipeApi } from "../../lib/data"; // Ajusta según tu API
 import SquareBar from "@/app/components/SquareBar";
+import AdsterraNativeBanner from "@/app/components/AdsterraNativeBanner";
 import { getErrorMessage, ERROR_MESSAGES } from "@/app/lib/utils/errorUtils";
 import ErrorMessage from "@/app/components/ErrorMessage";
 
@@ -338,6 +339,11 @@ export default function RecipeDetailsPage() {
               ))}
             </div>
           </div>
+        </div>
+
+        {/* Anuncio de Adsterra */}
+        <div className="mt-8 bg-white rounded-2xl shadow-xl p-6">
+          <AdsterraNativeBanner />
         </div>
 
         {/* Pasos de preparación */}
