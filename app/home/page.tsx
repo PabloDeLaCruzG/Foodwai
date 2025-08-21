@@ -6,10 +6,8 @@ import { recipeApi, userApi } from "../lib/data";
 import { useState, useEffect, useCallback, useMemo } from "react";
 import RecipeCard from "../components/RecipeCard";
 import { SparklesIcon } from "@heroicons/react/24/solid";
-import AdsterraNativeBanner from "../components/AdsterraNativeBanner";
 import WizardModal from "../components/WizardModal";
 import { useAuth } from "../context/AuthContext";
-//import AsideSection from "../components/AsideSection";
 import Image from "next/image";
 import AdModal from "../components/AdModal";
 import FilterTabs from "../components/filters/FilterTabs";
@@ -17,7 +15,8 @@ import SearchBar from "../components/filters/SearchBar";
 import SortBy from "../components/filters/SortBy";
 import { getErrorMessage, ERROR_MESSAGES } from "../lib/utils/errorUtils";
 import ErrorMessage from "../components/ErrorMessage";
-import AdsterraBanner from "../components/AdsterraBanner";
+import AdsterraNativeBanner from "../components/AdsterraNativeBanner";
+import AdsPopupManager from "../components/AdsPopupManager";
 
 export default function Home() {
   const [recipes, setRecipes] = useState<IRecipe[]>([]);
@@ -289,7 +288,7 @@ export default function Home() {
                         onFavoriteToggle={handleFavoriteToggle}
                       />
                       <div key={`ad-${recipe._id}`} className="col-span-1">
-                        <AdsterraBanner />
+                        <AdsterraNativeBanner />
                       </div>
                     </React.Fragment>
                   );
@@ -335,6 +334,9 @@ export default function Home() {
           />
         </div>
       )}
+
+      {/* Popup de anuncios */}
+      <AdsPopupManager />
     </main>
   );
 }
